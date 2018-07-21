@@ -1,7 +1,13 @@
 # Mathematical-Modeling
-For Mathematical Modeling Contest in September. This is useful tools we may use.
+For Mathematical Modeling Contest in September. This are useful tools we may use.
 ## ezga.m 
-  * Using *Sheffield University's GA Toolbox* to optimize something.
+  * Using *Sheffield University's GA Toolbox* to optimize minimum searching of a function.
+
+### Version 1.2
+  * Enable *EnableNlnrSearch* to enhance local search.
+  * **NOTICE:** Using *NonlinearInterval* to change local search interval in GA main search.
+  * **WARNING: Total search time will be a little longer than before.**
+  
 ### Version 1.1
   * Change crtbp to crtrp for better performance.
   * Remove bs2rv function and optimize bugs.
