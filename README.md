@@ -1,5 +1,5 @@
 # Mathematical-Modeling
-For Mathematical Modeling Contest in September. This are useful tools we may use.
+For Mathematical Modeling Contest in September. These are useful tools we may use.
 ## ezga.m 
   * Using *Sheffield University's GA Toolbox* [http://codem.group.shef.ac.uk/index.php/ga-toolbox] to optimize minimum searching of a function.
 
