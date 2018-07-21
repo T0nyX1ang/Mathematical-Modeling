@@ -1,2 +1,6 @@
 # Mathematical-Modeling
-For Mathematical Modeling Contest in September. This are useful tools we may use.
+For Mathematical Modeling Contest in September.
+
+# Contents
+  * MATLAB Exercises
+  * Useful Tools
