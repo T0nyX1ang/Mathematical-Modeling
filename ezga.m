@@ -2,16 +2,18 @@ function [bestx, optimal] = ezga(fun, nvars, lb, ub)
     % CHANGE THE FUNCTION FIRST IF YOU WANT A MAXIMUM SEARCH
 
     % Configuration
-    PopulationNumber = 40;
-    MaxGeneration = 100;
+    PopulationNumber = 50;
+    MaxGeneration = 30;
     GenerationGap = 0.95;
-    CrossoverProb = 0.7;
-    MutationProb = 0.01;
+    CrossoverProb = 0.6;
+    MutationProb = 0.1;
     SUBPOP = 1;
     InsertOption = 1; % 0 for uniform choice, 1 for fitness value, 2 for ratio value
-    SEL_Function = 'sus'; % rws or sus
+    SEL_Function = 'rws'; % rws or sus
     REC_Function = 'xovsp'; % recdis or xovsp
     DrawEvolutionTable = 1;
+    EnableNlnrSearch = 0; % enable fmincon search here
+    NonlinearInterval = 5;
 
     % Initialization
     tracer = zeros(nvars + 1, MaxGeneration);
@@ -30,13 +32,25 @@ function [bestx, optimal] = ezga(fun, nvars, lb, ub)
         FitnessValue = ranking(ObjectValue); % define fitness value
         SelectPopulation = select(SEL_Function, CreatePopulation, FitnessValue, GenerationGap); % select population
         Recombination = recombin(REC_Function, SelectPopulation, CrossoverProb); % recombine
-        Mutation = mutbga(Recombination, FieldDescriptor, MutationProb); % mutate
-        
+        Mutation = mutbga(Recombination, FieldDescriptor, MutationProb); % mutate        
         X = Mutation;
+        
         ObjectValueNext = zeros(size(X, 1), 1);
         for i = 1:size(X, 1)
             ObjectValueNext(i) = fun(X(i, :)'); % generate son generation values
         end
+        
+        % nonlinear optimization using current X value for a local optimization.
+        if mod(counter, NonlinearInterval) == 0 && counter > 0 && EnableNlnrSearch == 1
+            tempX = zeros(size(X, 1), nvars);
+            options = optimset();
+            options.Display = 'off';
+            for i = 1:size(X, 1)
+                tempx = fmincon(fun, X(i, :)', [], [], [], [], lb, ub, [], options);
+                tempX(i, :) = tempx';
+            end
+            X = tempX;
+        end  
         
         [CreatePopulation, ObjectValue] = reins(CreatePopulation, Mutation, SUBPOP, ...
                                                 InsertOption, ObjectValue, ObjectValueNext);  % reinsert son to father
