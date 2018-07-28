@@ -2,6 +2,15 @@
 For Mathematical Modeling Contest in September. These are useful tools we may use.
 ## ezga.m 
   * Using *Sheffield University's GA Toolbox* [http://codem.group.shef.ac.uk/index.php/ga-toolbox] to optimize minimum searching of a function.
+  
+### Version 1.3
+  * Add multiple population GA feature. (alias:*MPGA*)
+  * **NOTICE:** 
+    1. Using *SUBPOP* to change population number. 
+    2. Using *MigrationInterval* to change migration interval between different populations. 
+    3. Using *MigrationProb* to change migration probability.
+  * Fix a bug.
+  * Re-organize the configuration code.
 
 ### Version 1.2
   * Enable *EnableNlnrSearch* to enhance local search.
@@ -15,4 +24,4 @@ For Mathematical Modeling Contest in September. These are useful tools we may us
   * Execution time shortened. 
 
 ### Version 1.0
-  * First version of ezga
+  * First version of ezga.
