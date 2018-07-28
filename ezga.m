@@ -1,38 +1,53 @@
 function [bestx, optimal] = ezga(fun, nvars, lb, ub)
     % CHANGE THE FUNCTION FIRST IF YOU WANT A MAXIMUM SEARCH
 
-    % Configuration
+    % Configuration.Basics
     PopulationNumber = 50;
-    MaxGeneration = 30;
+    MaxGeneration = 50;
     GenerationGap = 0.95;
-    CrossoverProb = 0.6;
-    MutationProb = 0.1;
-    SUBPOP = 1;
-    InsertOption = 1; % 0 for uniform choice, 1 for fitness value, 2 for ratio value
+    
+    % Configuration.Selection
     SEL_Function = 'rws'; % rws or sus
+    CrossoverProb = 0.7;
+    
+    % Configuration.Recombination
     REC_Function = 'xovsp'; % recdis or xovsp
-    DrawEvolutionTable = 1;
+    InsertOption = 1; % 0 for uniform choice, 1 for fitness value, 2 for ratio value
+    
+    % Configuration.Mutation
+    MUT_Function = 'mutbga'; % mutate or mut
+    MutationProb = 0.1;
+    
+    % Configuration.Migration
+    SUBPOP = 10;
+    MigrationProb = 0.2;
+    MigrationInterval = 10;
+    
+    % Configuration.NonlinearSearch
     EnableNlnrSearch = 0; % enable fmincon search here
     NonlinearInterval = 5;
+    
+    % Configuration.PlotFigure
+    DrawEvolutionTable = 1;
 
     % Initialization
     tracer = zeros(nvars + 1, MaxGeneration);
     FieldDescriptor = [lb; ub];
-    CreatePopulation = crtrp(PopulationNumber, FieldDescriptor);
+    PopulationInfo = crtrp(PopulationNumber * SUBPOP, FieldDescriptor);
     
     % Optimization
     counter = 0;                                                                              
-    X = CreatePopulation;
+    X = PopulationInfo;
     ObjectValue = zeros(size(X, 1), 1);
     for i = 1:size(X, 1)
         ObjectValue(i) = fun(X(i, :)');
     end 
     
     while counter < MaxGeneration
-        FitnessValue = ranking(ObjectValue); % define fitness value
-        SelectPopulation = select(SEL_Function, CreatePopulation, FitnessValue, GenerationGap); % select population
-        Recombination = recombin(REC_Function, SelectPopulation, CrossoverProb); % recombine
-        Mutation = mutbga(Recombination, FieldDescriptor, MutationProb); % mutate        
+        FitnessValue = ranking(ObjectValue, 2, SUBPOP); % define fitness value
+        SelectPopulation = select(SEL_Function, PopulationInfo, FitnessValue, GenerationGap, SUBPOP); % select population
+        Recombination = recombin(REC_Function, SelectPopulation, CrossoverProb, SUBPOP); % recombine
+        Mutation = mutate(MUT_Function, Recombination, FieldDescriptor, MutationProb, SUBPOP); % mutate        
         X = Mutation;
         
         ObjectValueNext = zeros(size(X, 1), 1);
@@ -52,10 +67,15 @@ function [bestx, optimal] = ezga(fun, nvars, lb, ub)
             X = tempX;
         end  
         
-        [CreatePopulation, ObjectValue] = reins(CreatePopulation, Mutation, SUBPOP, ...
+        [PopulationInfo, ObjectValue] = reins(PopulationInfo, X, SUBPOP, ...
                                                 InsertOption, ObjectValue, ObjectValueNext);  % reinsert son to father
-
-        X = CreatePopulation;                                    
+                                            
+        if (mod(counter,MigrationInterval) == 0)
+            [PopulationInfo, ObjectValue] = migrate(PopulationInfo, SUBPOP, ...
+                                                      [MigrationProb, 1, 0], ObjectValue); % migration
+        end
+        
+        X = PopulationInfo;                                    
         counter = counter + 1; % update counter
         [Optimal, Index] = min(ObjectValue); % get minimal index
         tracer(1:nvars, counter) = X(Index, 1:nvars); % get minimal in every generation
@@ -74,5 +94,5 @@ function [bestx, optimal] = ezga(fun, nvars, lb, ub)
 
     % Output Value
     optimal = tracer(end, end);
-    bestx = tracer(1:nvars, end);
+    bestx = tracer(1:nvars, end); 
 end
