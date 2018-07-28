@@ -8,9 +8,9 @@ For Mathematical Modeling Contest in September. These are useful tools we may us
   * Fix a bug.
   * Re-organize the configuration code.
   * **NOTICE:** 
-    (1) Using *SUBPOP* to change population number. 
-    (2) Using *MigrationInterval* to change migration interval between different populations. 
-    (3) Using *MigrationProb* to change migration probability.
+    1. Using *SUBPOP* to change population number. 
+    2. Using *MigrationInterval* to change migration interval between different populations. 
+    3. Using *MigrationProb* to change migration probability.
 
 ### Version 1.2
   * Enable *EnableNlnrSearch* to enhance local search.
