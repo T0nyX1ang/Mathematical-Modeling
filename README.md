@@ -3,6 +3,11 @@ For Mathematical Modeling Contest in September. These are useful tools we may us
 ## ezga.m 
   * Using *Sheffield University's GA Toolbox* [http://codem.group.shef.ac.uk/index.php/ga-toolbox] to optimize minimum searching of a function.
   
+### Version 1.4
+  * Add Elitist GA feature.
+  * Add two modules to help with *Elitist* feature: *eltselect* and *eltchange*. You can see infomation below.
+  * Performance enhanced.
+
 ### Version 1.3
   * Add multiple population GA feature. (alias: *MPGA*)
   * Fix a bug.
@@ -26,13 +31,16 @@ For Mathematical Modeling Contest in September. These are useful tools we may us
 ### Version 1.0
   * First version of *ezga*.
 
-
+##
 ## eltselect.m
-  * Using *Elitist* methods in normal GA. This is the selection module. Please use it together with [**ezga**].
+  * Using *Elitist* methods in normal GA. This is the selection module. Please use it together with **ezga**.
 ### Version 1.0
   * First version of *eltselect*.
-  
+
+##
 ## eltchange.m
-  * Using *Elitist* methods in normal GA. This is the substitution module. Please use it together with [**ezga**].
+  * Using *Elitist* methods in normal GA. This is the substitution module. Please use it together with **ezga**.
+### Version 1.0.1
+  * Fix a bug. Apply implemental changes.
 ### Version 1.0
   * First version of *eltchange*.
