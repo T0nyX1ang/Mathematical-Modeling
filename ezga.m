@@ -9,6 +9,7 @@ function [bestx, optimal] = ezga(fun, nvars, lb, ub)
     % Configuration.Selection
     SEL_Function = 'rws'; % rws or sus
     CrossoverProb = 0.7;
+    %Elitist = SUBPOP;
     
     % Configuration.Recombination
     REC_Function = 'xovsp'; % recdis or xovsp
@@ -36,15 +37,17 @@ function [bestx, optimal] = ezga(fun, nvars, lb, ub)
     PopulationInfo = crtrp(PopulationNumber * SUBPOP, FieldDescriptor);
     
     % Optimization
-    counter = 0;                                                                              
+    counter = 0;    
+    GlobalMaxFitnV = -inf * ones(SUBPOP, 1);
     X = PopulationInfo;
     ObjectValue = zeros(size(X, 1), 1);
     for i = 1:size(X, 1)
         ObjectValue(i) = fun(X(i, :)');
     end 
-    
+        
     while counter < MaxGeneration
-        FitnessValue = ranking(ObjectValue, 2, SUBPOP); % define fitness value
+        FitnessValue = ranking(ObjectValue, 2, SUBPOP); % define fitness value        
+        [LocalMaxFitnV, LocalBestObjV, LocalBestIndividual] = eltselect(FitnessValue, PopulationInfo, ObjectValue, SUBPOP); % elitist selection    
         SelectPopulation = select(SEL_Function, PopulationInfo, FitnessValue, GenerationGap, SUBPOP); % select population
         Recombination = recombin(REC_Function, SelectPopulation, CrossoverProb, SUBPOP); % recombine
         Mutation = mutate(MUT_Function, Recombination, FieldDescriptor, MutationProb, SUBPOP); % mutate        
@@ -67,13 +70,17 @@ function [bestx, optimal] = ezga(fun, nvars, lb, ub)
             X = tempX;
         end  
         
-        [PopulationInfo, ObjectValue] = reins(PopulationInfo, X, SUBPOP, ...
-                                                InsertOption, ObjectValue, ObjectValueNext);  % reinsert son to father
+        [PopulationInfo, ObjectValue] = ...
+            reins(PopulationInfo, X, SUBPOP, InsertOption, ObjectValue, ObjectValueNext);  % reinsert son to father
                                             
         if (mod(counter,MigrationInterval) == 0)
-            [PopulationInfo, ObjectValue] = migrate(PopulationInfo, SUBPOP, ...
-                                                      [MigrationProb, 1, 0], ObjectValue); % migration
+            [PopulationInfo, ObjectValue] = ...
+                migrate(PopulationInfo, SUBPOP, [MigrationProb, 1, 0], ObjectValue); % migration
         end
+       
+        [GlobalMaxFitnV, PopulationInfo, ObjectValue] = ...
+            eltchange(PopulationInfo, ObjectValue, GlobalMaxFitnV, LocalMaxFitnV, ...
+            LocalBestObjV, LocalBestIndividual, SUBPOP); % elitist substitution
         
         X = PopulationInfo;                                    
         counter = counter + 1; % update counter
