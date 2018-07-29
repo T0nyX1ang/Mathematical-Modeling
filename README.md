@@ -24,4 +24,15 @@ For Mathematical Modeling Contest in September. These are useful tools we may us
   * Execution time shortened. 
 
 ### Version 1.0
-  * First version of ezga.
+  * First version of *ezga*.
+
+
+## eltselect.m
+  * Using *Elitist* methods in normal GA. This is the selection module. Please use it together with [**ezga**].
+### Version 1.0
+  * First version of *eltselect*.
+  
+## eltchange.m
+  * Using *Elitist* methods in normal GA. This is the substitution module. Please use it together with [**ezga**].
+### Version 1.0
+  * First version of *eltchange*.
