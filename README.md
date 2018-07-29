@@ -5,3 +5,6 @@ For Mathematical Modeling Contest in September.
   * MATLAB Exercises
   * Useful Tools
   * Modules within Tools **(Make sure you put those modules into your working directory!)**
+
+# Notice
+  * This project uses GPL license due to the *GA Toolbox* in **Tools** branch.
