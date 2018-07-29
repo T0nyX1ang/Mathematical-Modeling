@@ -19,7 +19,8 @@ function [GlobalMaxFitnV, Chrom, ObjV] = eltchange(Chrom, ObjV, GlobalMaxFitnV, 
     
     if nargin == 6
         SUBPOP = 1;
-    elseif nargin < 4
+    elseif nargin < 6
+
         error('Insufficient variables.')
     end
     
