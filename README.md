@@ -44,7 +44,7 @@ For Mathematical Modeling Contest in September. These are useful tools we may us
   * First version of *eltchange*.
 
 ## ga4tsp.m
-  * This is the first STSP(symmetric traveling salesman problem) solver that we make. We design it under **ezga** and *GA Toolbox* mentioned before. Unlike the original **ezga**, the population structure, recombination function and mutation function need to be changed. Therefore, we add three major changes in the original *GA Toolbox*. There are *crtperm*, *intercross* and *mutation*. And there are 2 template connectors to help you link those methods to the original *GA Toolbox*. There are *REC_Template* and *MUT_Template*.
+  * This is the first STSP(symmetric traveling salesman problem) solver that we make. We design it under **ezga** and *GA Toolbox* mentioned before. Unlike the original **ezga**, the population structure, recombination function and mutation function need to be changed. Therefore, we add three major changes in the original *GA Toolbox*. There are *crtperm*, *intercross* and *mutation*. And there are 2 template connectors to help you link those methods to the original *GA Toolbox*. There are *REC_Template* and *MUT_Template*. Finally, there is a file to calculate the distance called *dist*.
   * *crtperm* is for generating a permutational population. (*e.g.* [2 3 1 4 5 8 6 7] as an individual of 8 characters)
   * *intercross* is for generating sons by their parents. There are 6 methods available now. There are:
     * pmx: Partially-Mapped Crossover
@@ -56,6 +56,12 @@ For Mathematical Modeling Contest in September. These are useful tools we may us
   * *mutation* is for mutating those sons to acquire new possibilities. There are 2 methods available now. There are:
     * swap: swap 2 characters randomly
     * scramble: select 2 places and shuffle all the characters between it.
+  * *dist* is for calculating the distance between two cities. There are 5 methods available now. There are:
+    * euc: Euclidean Distance (L2)
+    * manh: Manhattan Distance (L1)
+    * max: Maximum Distance (L\inf)
+    * geo: Geographical Distance (**Notice: We use MATLAB's built-in function *distance* to calculate, it's time-consuming.**)
+    * custom: Custom Distance - You should give a distance table to use this feature.
   * *REC_Template* is for connecting *intercross* module. Just follow the instructions inside the file.
   * *MUT_Template* is for connecting *mutation* module. Just follow the instructions inside the file.
   * **Notice: Those algorithms are based on the paper: *Genetic algorithms for the traveling salesman problem, Jean-Yves Potvin, Annals of Operations Research 63(1996)339-370***. Deep appreciation for that.
