@@ -7,4 +7,4 @@ For Mathematical Modeling Contest in September.
   * Modules within Tools **(Make sure you put those modules into your working directory!)**
 
 # Notice
-  * This project uses GPL license due to the *GA Toolbox* in **Tools** branch.
+  * This project uses GNU GPLv2 license due to the *GA Toolbox* in **Tools** branch.
