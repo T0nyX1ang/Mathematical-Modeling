@@ -1,8 +1,12 @@
 # Mathematical-Modeling
 For Mathematical Modeling Contest in September. These are useful tools we may use.
-## ezga.m 
-  * Using *Sheffield University's GA Toolbox* [http://codem.group.shef.ac.uk/index.php/ga-toolbox] to optimize minimum searching of a function.
-  
+# ezga.m
+## Demonstration:
+  * Using *Sheffield University's GA Toolbox* [http://codem.group.shef.ac.uk/index.php/ga-toolbox] to optimize minimum searching of a function. There are two other functions to accomplish the *elitist* method. There are *eltselect* and *eltchange*. 
+  * *eltselect*: using *Elitist* methods in normal GA. This is the selection module. Please use it together with **ezga**.
+  * *eltchange*: using *Elitist* methods in normal GA. This is the substitution module. Please use it together with **ezga**.
+
+## Changelog:
 ### Version 1.4
   * Add Elitist GA feature.
   * Add two modules to help with *Elitist* feature: *eltselect* and *eltchange*. You can see infomation below.
@@ -31,19 +35,8 @@ For Mathematical Modeling Contest in September. These are useful tools we may us
 ### Version 1.0
   * First version of *ezga*.
 
-## eltselect.m
-  * Using *Elitist* methods in normal GA. This is the selection module. Please use it together with **ezga**.
-### Version 1.0
-  * First version of *eltselect*.
-
-## eltchange.m
-  * Using *Elitist* methods in normal GA. This is the substitution module. Please use it together with **ezga**.
-### Version 1.0.1
-  * Fix a bug. Apply implemental changes.
-### Version 1.0
-  * First version of *eltchange*.
-
-## ga4tsp.m
+# ga4tsp.m
+## Demonstration:
   * This is the first STSP(symmetric traveling salesman problem) solver that we make. We design it under **ezga** and *GA Toolbox* mentioned before. Unlike the original **ezga**, the population structure, recombination function and mutation function need to be changed. Therefore, we add three major changes in the original *GA Toolbox*. There are *crtperm*, *intercross* and *mutation*. And there are 2 template connectors to help you link those methods to the original *GA Toolbox*. There are *REC_Template* and *MUT_Template*. Finally, there is a file to calculate the distance called *dist*.
   * *crtperm* is for generating a permutational population. (*e.g.* [2 3 1 4 5 8 6 7] as an individual of 8 characters)
   * *intercross* is for generating sons by their parents. There are 6 methods available now. There are:
@@ -65,8 +58,12 @@ For Mathematical Modeling Contest in September. These are useful tools we may us
   * *REC_Template* is for connecting *intercross* module. Just follow the instructions inside the file.
   * *MUT_Template* is for connecting *mutation* module. Just follow the instructions inside the file.
   * **Notice: Those algorithms are based on the paper: *Genetic algorithms for the traveling salesman problem, Jean-Yves Potvin, Annals of Operations Research 63(1996)339-370***. Deep appreciation for that.
-  
-  
+
+## Changelog:
+### Version 1.0
+  * First version of ga4tsp.
+  * Add methods and references. Enrich demonstration.
+
 ## References
   * Sheffield University's GA Toolbox: http://codem.group.shef.ac.uk/index.php/ga-toolbox
   * Genetic algorithms for the traveling salesman problem, Jean-Yves Potvin, Annals of Operations Research 63(1996)339-370
