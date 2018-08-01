@@ -31,16 +31,36 @@ For Mathematical Modeling Contest in September. These are useful tools we may us
 ### Version 1.0
   * First version of *ezga*.
 
-##
 ## eltselect.m
   * Using *Elitist* methods in normal GA. This is the selection module. Please use it together with **ezga**.
 ### Version 1.0
   * First version of *eltselect*.
 
-##
 ## eltchange.m
   * Using *Elitist* methods in normal GA. This is the substitution module. Please use it together with **ezga**.
 ### Version 1.0.1
   * Fix a bug. Apply implemental changes.
 ### Version 1.0
   * First version of *eltchange*.
+
+## ga4tsp.m
+  * This is the first STSP(symmetric traveling salesman problem) solver that we make. We design it under **ezga** and *GA Toolbox* mentioned before. Unlike the original **ezga**, the population structure, recombination function and mutation function need to be changed. Therefore, we add three major changes in the original *GA Toolbox*. There are *crtperm*, *intercross* and *mutation*. And there are 2 template connectors to help you link those methods to the original *GA Toolbox*. There are *REC_Template* and *MUT_Template*.
+  * *crtperm* is for generating a permutational population. (*e.g.* [2 3 1 4 5 8 6 7] as an individual of 8 characters)
+  * *intercross* is for generating sons by their parents. There are 6 methods available now. There are:
+    * pmx: Partially-Mapped Crossover
+    * cx: Cyclinic Crossover
+    * ox: Order Crossover
+    * obx: Order-Based Crossover
+    * pbx: Position-Based Crossover
+    * er: Edge Recombination (**Notice: This method is much slower than others, but it performs better.**)
+  * *mutation* is for mutating those sons to acquire new possibilities. There are 2 methods available now. There are:
+    * swap: swap 2 characters randomly
+    * scramble: select 2 places and shuffle all the characters between it.
+  * *REC_Template* is for connecting *intercross* module. Just follow the instructions inside the file.
+  * *MUT_Template* is for connecting *mutation* module. Just follow the instructions inside the file.
+  * **Notice: Those algorithms are based on the paper: *Genetic algorithms for the traveling salesman problem, Jean-Yves Potvin, Annals of Operations Research 63(1996)339-370***. Deep appreciation for that.
+  
+  
+## References
+  * Sheffield University's GA Toolbox: http://codem.group.shef.ac.uk/index.php/ga-toolbox
+  * Genetic algorithms for the traveling salesman problem, Jean-Yves Potvin, Annals of Operations Research 63(1996)339-370
