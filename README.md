@@ -37,7 +37,9 @@ For Mathematical Modeling Contest in September. These are useful tools we may us
 
 # ga4tsp.m
 ## Demonstration:
-  * This is the first STSP(symmetric traveling salesman problem) solver that we make. We design it under **ezga** and *GA Toolbox* mentioned before. Unlike the original **ezga**, the population structure, recombination function and mutation function need to be changed. Therefore, we add three major changes in the original *GA Toolbox*. There are *crtperm*, *intercross* and *mutation*. And there are 2 template connectors to help you link those methods to the original *GA Toolbox*. There are *REC_Template* and *MUT_Template*. Finally, there is a file to calculate the distance called *dist*.
+  * This is the first STSP (symmetric traveling salesman problem) solver that we make. We design it under **ezga** and *GA Toolbox* mentioned before. Unlike the original **ezga**, the population structure, recombination function and mutation function need to be changed. Therefore, we add three major changes in the original *GA Toolbox*. There are *crtperm*, *intercross* and *mutation*. And there are 2 template connectors to help you link those methods to the original *GA Toolbox*. There are *REC_Template* and *MUT_Template*. Finally, there is a file to calculate the distance called *dist*.
+  * **Notice: Recently we have added a 2-opt tool to optimize solution, but it will cost fairly much time. This feature is under development, please handle it with care.
+  
   * ***crtperm*** is for generating a permutational population. (*e.g.* [2 3 1 4 5 8 6 7] as an individual of 8 characters)
   * ***intercross*** is for generating sons by their parents. There are 6 methods available now. There are:
     * **pmx**: Partially-Mapped Crossover
@@ -57,9 +59,13 @@ For Mathematical Modeling Contest in September. These are useful tools we may us
     * **custom**: Custom Distance - You should give a distance table to use this feature.
   * ***REC_Template*** is for connecting *intercross* module. Just follow the instructions inside the file.
   * ***MUT_Template*** is for connecting *mutation* module. Just follow the instructions inside the file.
+  * ***opt-2*** is for optimizing solutions using a local minimum search.
   * **Notice: Those algorithms are based on the paper: *Genetic algorithms for the traveling salesman problem, Jean-Yves Potvin, Annals of Operations Research 63(1996)339-370***. Deep appreciation for that.
 
 ## Changelog:
+### Version 1.1-beta
+  * Add 2-top feature.
+  * Change some parameters according to the new feature.
 ### Version 1.0
   * First version of ga4tsp.
   * Add methods and references. Enrich demonstration.
@@ -67,3 +73,11 @@ For Mathematical Modeling Contest in September. These are useful tools we may us
 ## References
   * Sheffield University's GA Toolbox: http://codem.group.shef.ac.uk/index.php/ga-toolbox
   * Genetic algorithms for the traveling salesman problem, Jean-Yves Potvin, Annals of Operations Research 63(1996)339-370
+
+# sa4tsp.m
+## Demonstration:
+  * SA (Simulated Annealing) is an algorithm to find global optimum by simulating metal temperature change during annealing. It's a variation of hill-climbing algorithm. It's very stable and it can reach global optimum theoretically. But time will surge when dimension is rising.
+
+## Changelog:
+### Version 1.0
+  * First version of sa4tsp.
