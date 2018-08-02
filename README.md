@@ -70,10 +70,6 @@ For Mathematical Modeling Contest in September. These are useful tools we may us
   * First version of ga4tsp.
   * Add methods and references. Enrich demonstration.
 
-## References
-  * Sheffield University's GA Toolbox: http://codem.group.shef.ac.uk/index.php/ga-toolbox
-  * Genetic algorithms for the traveling salesman problem, Jean-Yves Potvin, Annals of Operations Research 63(1996)339-370
-
 # sa4tsp.m
 ## Demonstration:
   * SA (Simulated Annealing) is an algorithm to find global optimum by simulating metal temperature change during annealing. It's a variation of hill-climbing algorithm. It's very stable and it can reach global optimum theoretically. But time will surge when dimension is rising.
@@ -81,3 +77,7 @@ For Mathematical Modeling Contest in September. These are useful tools we may us
 ## Changelog:
 ### Version 1.0
   * First version of sa4tsp.
+  
+# References
+  * Sheffield University's GA Toolbox: http://codem.group.shef.ac.uk/index.php/ga-toolbox
+  * Genetic algorithms for the traveling salesman problem, Jean-Yves Potvin, Annals of Operations Research 63(1996)339-370
