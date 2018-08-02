@@ -1,8 +1,8 @@
 function [bestx, optimal] = ga4tsp(Data)
 
     % Configuration.Basics
-    PopulationNumber = 50;
-    MaxGeneration = 1500;
+    PopulationNumber = 60;
+    MaxGeneration = 100;
     GenerationGap = 0.95;
     
     % Configuration.DistanceAlgorithm
@@ -20,9 +20,10 @@ function [bestx, optimal] = ga4tsp(Data)
     % Configuration.Mutation
     MUT_Function = 'scramble'; % swap, scramble
     MutationProb = 0.1;
+    Opt_Iteration = 200;
     
     % Configuration.Migration
-    SUBPOP = 50;
+    SUBPOP = 20;
     MigrationProb = 0.2;
     MigrationInterval = 10;
     
@@ -49,7 +50,10 @@ function [bestx, optimal] = ga4tsp(Data)
         SelectPopulation = select(SEL_Function, PopulationInfo, FitnessValue, GenerationGap, SUBPOP); % select population
         Recombination = recombin(REC_Function, SelectPopulation, CrossoverProb, SUBPOP); % recombine
         Mutation = mutate(MUT_Function, Recombination, [], MutationProb, SUBPOP); % mutate
-        X = Mutation;
+        for i = 1:size(Mutation, 1)
+            Opts(i, :) = opt2(Mutation(i, :), Opt_Iteration, Data, DIST_Function);
+        end
+        X = Opts;
         
         ObjectValueNext = zeros(size(X, 1), 1);
         for i = 1:size(X, 1)
