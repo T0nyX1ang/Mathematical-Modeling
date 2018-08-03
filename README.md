@@ -37,8 +37,8 @@ For Mathematical Modeling Contest in September. These are useful tools we may us
 
 # ga4tsp.m
 ## Demonstration:
-  * This is the first STSP (symmetric traveling salesman problem) solver that we make. We design it under **ezga** and *GA Toolbox* mentioned before. Unlike the original **ezga**, the population structure, recombination function and mutation function need to be changed. Therefore, we add three major changes in the original *GA Toolbox*. There are *crtperm*, *intercross* and *mutation*. And there are 2 template connectors to help you link those methods to the original *GA Toolbox*. There are *REC_Template* and *MUT_Template*. Finally, there is a file to calculate the distance called *dist*.
-  * **Notice: Recently we have added a 2-opt tool to optimize solution, but it will cost fairly much time. This feature is under development, please handle it with care.
+  * This is the first STSP (symmetric traveling salesman problem) solver that we make. We design it under **ezga** and *GA Toolbox* mentioned before. Unlike the original **ezga**, the population structure, recombination function and mutation function need to be changed. Therefore, we add three major changes in the original *GA Toolbox*. There are *crtperm*, *intercross* and *mutation*. And there is 1 template connectors to help you link those methods to the original *GA Toolbox* which is called *REC_Template*. We integrate mutation and optimization to save time. Finally, there is a file to calculate the distance called *dist*.
+  * **Notice: *optmutate* is a new feature to integrate mutation and optimization. Many files have been removed in this version.
   
   * ***crtperm*** is for generating a permutational population. (*e.g.* [2 3 1 4 5 8 6 7] as an individual of 8 characters)
   * ***intercross*** is for generating sons by their parents. There are 6 methods available now. There are:
@@ -48,9 +48,16 @@ For Mathematical Modeling Contest in September. These are useful tools we may us
     * **obx**: Order-Based Crossover
     * **pbx**: Position-Based Crossover
     * **er**: Edge Recombination (**Notice: This method is much slower than others, but it performs better.**)
-  * ***mutation*** is for mutating those sons to acquire new possibilities. There are 2 methods available now. There are:
+  * ***optmutate*** is for mutating those sons to acquire new possibilities. There are 5 methods in mutation and 2 methods in optimization available now. There are:
+    * ------------------------------------------ **mutation** ------------------------------------------
     * **swap**: swap 2 characters randomly
-    * **scramble**: select 2 places and shuffle all the characters between it.
+    * **scramble**: select 2 places and shuffle all the characters between it
+    * **m2opt**: mutation for 2-opt process (best-fit, default version now)
+    * **m3opt**: mutation for 3-opt process
+    * **m4opt**: mutation for 4-opt process
+    * ---------------------------------------- **optimization** ----------------------------------------
+    * **hlclb**: hill-climbing optimization (best-fit, default version now)
+    * **sa**: simulated annealing optimization
   * ***dist*** is for calculating the distance between two cities. There are 5 methods available now. There are:
     * **euc**: Euclidean Distance (L2)
     * **manh**: Manhattan Distance (L1)
@@ -58,11 +65,16 @@ For Mathematical Modeling Contest in September. These are useful tools we may us
     * **geo**: Geographical Distance (**Notice: We use MATLAB's built-in function *distance* to calculate, it's time-consuming.**)
     * **custom**: Custom Distance - You should give a distance table to use this feature.
   * ***REC_Template*** is for connecting *intercross* module. Just follow the instructions inside the file.
-  * ***MUT_Template*** is for connecting *mutation* module. Just follow the instructions inside the file.
-  * ***opt-2*** is for optimizing solutions using a local minimum search.
+  * ~~***MUT_Template*** is for connecting *mutation* module. Just follow the instructions inside the file.~~
+  * ~~***opt-2*** is for optimizing solutions using a local minimum search.~~
   * **Notice: Those algorithms are based on the paper: *Genetic algorithms for the traveling salesman problem, Jean-Yves Potvin, Annals of Operations Research 63(1996)339-370***. Deep appreciation for that.
 
 ## Changelog:
+### Version 1.2
+  * Integrate mutation and optimization to one function. Operation time has been greatly shortened.
+  * Remove these functions: **mutate.m**, **mutation.m**, **opt2.m**, etc. to save space.
+  * Add 2-opt, 3-opt, 4-opt, hill-climbing, simulated annealing feature in the integration.
+  * **Notice: REC_Template, intercross function will be very likely deprecated in the future.**
 ### Version 1.1-beta
   * Add 2-top feature.
   * Change some parameters according to the new feature.
