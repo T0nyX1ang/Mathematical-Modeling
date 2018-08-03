@@ -1,7 +1,7 @@
 function [bestx, optimal] = ga4tsp(Data)
 
     % Configuration.Basics
-    PopulationNumber = 60;
+    PopulationNumber = 100;
     MaxGeneration = 100;
     GenerationGap = 0.95;
     
@@ -18,9 +18,9 @@ function [bestx, optimal] = ga4tsp(Data)
     InsertOption = 1; % 0 for uniform choice, 1 for fitness value, 2 for ratio value
     
     % Configuration.Mutation
-    MUT_Function = 'scramble'; % swap, scramble
+    MUT_Function = 'm2opt'; % swap, scramble, m2opt, m3opt, m4opt
+    OPT_Function = 'hlclb'; % hlclb, sa
     MutationProb = 0.1;
-    Opt_Iteration = 200;
     
     % Configuration.Migration
     SUBPOP = 20;
@@ -49,11 +49,8 @@ function [bestx, optimal] = ga4tsp(Data)
         [LocalMaxFitnV, LocalBestObjV, LocalBestIndividual] = eltselect(FitnessValue, PopulationInfo, ObjectValue, SUBPOP); % elitist selection    
         SelectPopulation = select(SEL_Function, PopulationInfo, FitnessValue, GenerationGap, SUBPOP); % select population
         Recombination = recombin(REC_Function, SelectPopulation, CrossoverProb, SUBPOP); % recombine
-        Mutation = mutate(MUT_Function, Recombination, [], MutationProb, SUBPOP); % mutate
-        for i = 1:size(Mutation, 1)
-            Opts(i, :) = opt2(Mutation(i, :), Opt_Iteration, Data, DIST_Function);
-        end
-        X = Opts;
+        Mutation = optmutate(MUT_Function, OPT_Function, DIST_Function, Data, Recombination, MutationProb, SUBPOP); % mutate
+        X = Mutation;
         
         ObjectValueNext = zeros(size(X, 1), 1);
         for i = 1:size(X, 1)
