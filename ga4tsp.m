@@ -34,6 +34,7 @@ function [bestx, optimal] = ga4tsp(Data)
     nvars = size(Data, 1);
     tracer = zeros(nvars + 1, MaxGeneration);
     PopulationInfo = crtpermp(PopulationNumber * SUBPOP, nvars);
+    DistTable = gentable(Data, DIST_Function);
     
     % Optimization
     counter = 0;    
@@ -41,7 +42,7 @@ function [bestx, optimal] = ga4tsp(Data)
     X = PopulationInfo;
     ObjectValue = zeros(size(X, 1), 1);
     for i = 1:size(X, 1)
-        ObjectValue(i) = dist(X(i, :)', Data, DIST_Function);
+        ObjectValue(i) = dist(X(i, :)', DistTable);
     end 
         
     while counter < MaxGeneration
@@ -49,12 +50,12 @@ function [bestx, optimal] = ga4tsp(Data)
         [LocalMaxFitnV, LocalBestObjV, LocalBestIndividual] = eltselect(FitnessValue, PopulationInfo, ObjectValue, SUBPOP); % elitist selection    
         SelectPopulation = select(SEL_Function, PopulationInfo, FitnessValue, GenerationGap, SUBPOP); % select population
         Recombination = recombin(REC_Function, SelectPopulation, CrossoverProb, SUBPOP); % recombine
-        Mutation = optmutate(MUT_Function, OPT_Function, DIST_Function, Data, Recombination, MutationProb, SUBPOP); % mutate
+        Mutation = optmutate(MUT_Function, OPT_Function, DistTable, Recombination, MutationProb, SUBPOP); % mutate
         X = Mutation;
         
         ObjectValueNext = zeros(size(X, 1), 1);
         for i = 1:size(X, 1)
-            ObjectValueNext(i) = dist(X(i, :)', Data, DIST_Function); % generate son generation values
+            ObjectValueNext(i) = dist(X(i, :)', DistTable); % generate son generation values
         end 
         
         [PopulationInfo, ObjectValue] = ...

@@ -1,4 +1,4 @@
-function NewChrom = optmutate(MUT_F, OPT_F, DIST_F, Data, OldChrom, MutOpt, SUBPOP)
+function NewChrom = optmutate(MUT_F, OPT_F, DistTable, OldChrom, MutOpt, SUBPOP)
     % This file is modified from the original mutation from gatbx.
     % It's called optmutate which means this can do local optimalization in
     % mutation, and thus saving time. We remove some checking here because
@@ -17,7 +17,7 @@ function NewChrom = optmutate(MUT_F, OPT_F, DIST_F, Data, OldChrom, MutOpt, SUBP
     NewChrom = [];
     for irun = 1:SUBPOP
         ChromSub = OldChrom((irun-1)*Nind+1:irun*Nind,:);
-        NewChromSub = mutation(ChromSub, MUT_F, OPT_F, DIST_F, Data, MutOpt);
+        NewChromSub = mutation(ChromSub, MUT_F, OPT_F, DistTable, MutOpt);
         NewChrom=[NewChrom; NewChromSub];
     end
     
