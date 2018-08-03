@@ -3,6 +3,12 @@ For Mathematical Modeling Contest in September. These are useful tools we may us
 # ezga.m
 ## Demonstration:
   * Using *Sheffield University's GA Toolbox* [http://codem.group.shef.ac.uk/index.php/ga-toolbox] to optimize minimum searching of a function. There are two other functions to accomplish the *elitist* method. There are *eltselect* and *eltchange*. 
+
+## Function List:
+  * ***ezga***: main function.
+  * ***nlnrezga***: standalone nonlinear search of ezga function.
+  * ***ezmpga***: standalone multiple population of ezga function.
+  * ***ezelitga***: standalone elitist procedure of ezga function.
   * ***eltselect***: using *Elitist* methods in normal GA. This is the selection module. Please use it together with **ezga**.
   * ***eltchange***: using *Elitist* methods in normal GA. This is the substitution module. Please use it together with **ezga**.
 
@@ -37,9 +43,9 @@ For Mathematical Modeling Contest in September. These are useful tools we may us
 
 # ga4tsp.m
 ## Demonstration:
-  * This is the first STSP (symmetric traveling salesman problem) solver that we make. We design it under **ezga** and *GA Toolbox* mentioned before. Unlike the original **ezga**, the population structure, recombination function and mutation function need to be changed. Therefore, we add three major changes in the original *GA Toolbox*. There are *crtperm*, *intercross* and *mutation*. And there is 1 template connectors to help you link those methods to the original *GA Toolbox* which is called *REC_Template*. We integrate mutation and optimization to save time. Finally, there is a file to calculate the distance called *dist*.
-  * **Notice: *optmutate* is a new feature to integrate mutation and optimization. Many files have been removed in this version.
-  
+  * This is the first STSP (symmetric traveling salesman problem) solver that we make. We design it under **ezga** and *GA Toolbox* mentioned before. Unlike the original **ezga**, the population structure, recombination function and mutation function need to be changed. Therefore, we add three major changes in the original *GA Toolbox*. There are *crtperm*, *intercross* and *mutation*. And there is 1 template connectors to help you link those methods to the original *GA Toolbox* which is called *REC_Template*. We integrate mutation and optimization to save time. Finally, there is a file to calculate the distance called *dist*. To save time, we use a function named *gentable* to pre-calculate those distances.
+
+## Function List:
   * ***crtperm*** is for generating a permutational population. (*e.g.* [2 3 1 4 5 8 6 7] as an individual of 8 characters)
   * ***intercross*** is for generating sons by their parents. There are 6 methods available now. There are:
     * **pmx**: Partially-Mapped Crossover
@@ -50,6 +56,7 @@ For Mathematical Modeling Contest in September. These are useful tools we may us
     * **er**: Edge Recombination (**Notice: This method is much slower than others, but it performs better.**)
   * ***optmutate*** is for mutating those sons to acquire new possibilities. There are 5 methods in mutation and 2 methods in optimization available now. There are:
     * ------------------------------------------ **mutation** ------------------------------------------
+    * **mutation**: still act as a connector, but for that modified *optmutate*
     * **swap**: swap 2 characters randomly
     * **scramble**: select 2 places and shuffle all the characters between it
     * **m2opt**: mutation for 2-opt process (best-fit, default version now)
@@ -58,21 +65,22 @@ For Mathematical Modeling Contest in September. These are useful tools we may us
     * ---------------------------------------- **optimization** ----------------------------------------
     * **hlclb**: hill-climbing optimization (best-fit, default version now)
     * **sa**: simulated annealing optimization
-  * ***dist*** is for calculating the distance between two cities. There are 5 methods available now. There are:
+  * ***gentable*** is for calculating the distance between (any) two cities. There are 4 methods available now. There are:
     * **euc**: Euclidean Distance (L2)
     * **manh**: Manhattan Distance (L1)
     * **max**: Maximum Distance (L\inf)
-    * **geo**: Geographical Distance (**Notice: We use MATLAB's built-in function *distance* to calculate, it's time-consuming.**)
-    * **custom**: Custom Distance - You should give a distance table to use this feature.
+    * **geo**: Geographical Distance
+  * ***dist*** is for calculating the distance of a tour by the table generated above.  
   * ***REC_Template*** is for connecting *intercross* module. Just follow the instructions inside the file.
-  * ~~***MUT_Template*** is for connecting *mutation* module. Just follow the instructions inside the file.~~
-  * ~~***opt-2*** is for optimizing solutions using a local minimum search.~~
   * **Notice: Those algorithms are based on the paper: *Genetic algorithms for the traveling salesman problem, Jean-Yves Potvin, Annals of Operations Research 63(1996)339-370***. Deep appreciation for that.
 
 ## Changelog:
+### Version 1.3
+  * Modify the *dist* function and add a new function *gentable* to save time. (-50%)
+  * Change all the functions involving *dist* function.
 ### Version 1.2
   * Integrate mutation and optimization to one function. Operation time has been greatly shortened.
-  * Remove these functions: **mutate.m**, **mutation.m**, **opt2.m**, etc. to save space.
+  * Remove these functions: **mutate.m**, **opt2.m**, etc. to save space.
   * Add 2-opt, 3-opt, 4-opt, hill-climbing, simulated annealing feature in the integration.
   * **Notice: REC_Template, intercross function will be very likely deprecated in the future.**
 ### Version 1.1-beta
