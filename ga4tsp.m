@@ -49,7 +49,7 @@ function [bestx, optimal] = ga4tsp(Data)
         FitnessValue = ranking(ObjectValue, 2, SUBPOP); % define fitness value        
         [LocalMaxFitnV, LocalBestObjV, LocalBestIndividual] = eltselect(FitnessValue, PopulationInfo, ObjectValue, SUBPOP); % elitist selection    
         SelectPopulation = select(SEL_Function, PopulationInfo, FitnessValue, GenerationGap, SUBPOP); % select population
-        Recombination = recombin(REC_Function, SelectPopulation, CrossoverProb, SUBPOP); % recombine
+        Recombination = recombine(REC_Function, SelectPopulation, CrossoverProb, SUBPOP); % recombine
         Mutation = optmutate(MUT_Function, OPT_Function, DistTable, Recombination, MutationProb, SUBPOP); % mutate
         X = Mutation;
         
