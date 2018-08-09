@@ -46,7 +46,8 @@ For Mathematical Modeling Contest in September. These are useful tools we may us
   * This is the first STSP (symmetric traveling salesman problem) solver that we make. We design it under **ezga** and *GA Toolbox* mentioned before. Unlike the original **ezga**, the population structure, recombination function and mutation function need to be changed. Therefore, we add three major changes in the original *GA Toolbox*. There are *crtperm*, *intercross* and *mutation*. And there is 1 template connectors to help you link those methods to the original *GA Toolbox* which is called *REC_Template*. We integrate mutation and optimization to save time. Finally, there is a file to calculate the distance called *dist*. To save time, we use a function named *gentable* to pre-calculate those distances.
 
 ## Function List:
-  * ***crtperm*** is for generating a permutational population. (*e.g.* [2 3 1 4 5 8 6 7] as an individual of 8 characters)
+  * ***crtpermp*** is for generating a permutational population. (*e.g.* [2 3 1 4 5 8 6 7] as an individual of 8 characters)
+  * ***recombine*** is a modified version of *gatbx* to connect the *intercross* function below.
   * ***intercross*** is for generating sons by their parents. There are 6 methods available now. There are:
     * **pmx**: Partially-Mapped Crossover
     * **cx**: Cyclinic Crossover
@@ -71,10 +72,13 @@ For Mathematical Modeling Contest in September. These are useful tools we may us
     * **max**: Maximum Distance (L\inf)
     * **geo**: Geographical Distance
   * ***dist*** is for calculating the distance of a tour by the table generated above.  
-  * ***REC_Template*** is for connecting *intercross* module. Just follow the instructions inside the file.
   * **Notice: Those algorithms are based on the paper: *Genetic algorithms for the traveling salesman problem, Jean-Yves Potvin, Annals of Operations Research 63(1996)339-370***. Deep appreciation for that.
 
 ## Changelog:
+### Version 1.4
+  * Fix a bug in *hlclb* function.
+  * *REC_Template* function is deprecated from now on.
+  * Reduce dependency for *gatbx*
 ### Version 1.3
   * Modify the *dist* function and add a new function *gentable* to save time. (-50%)
   * Change all the functions involving *dist* function.
