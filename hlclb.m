@@ -1,6 +1,5 @@
-function NewChrom = hlclb(OldChrom, MUT_F, DistTable)
+function NewChrom = hlclb(OldChrom, MUT_F, DistTable, Iteration)
     % A function for HiLl-CLmBing optimization.
-    Iteration = 200;
     LocalOptimal = dist(OldChrom', DistTable);
     KeepBest = 0;
     for i = 1:Iteration

@@ -1,4 +1,4 @@
-function NewChrom = sa(OldChrom, MUT_F, DIST_F, Data)
+function NewChrom = sa(OldChrom, MUT_F, DIST_F, Data, ~)
     % A function for Simulated Annealing optimization.
     LocalOptimal = dist(OldChrom', Data, DIST_F);   
     

@@ -1,4 +1,4 @@
-function NewChrom = mutation(OldChrom, MUT_F, OPT_F, Data, Pm)
+function NewChrom = mutation(OldChrom, MUT_F, OPT_F, Data, Pm, Iter)
     % A function for generic MUTATION and local/global optimization.
     % 4 mutation methods are included
     % swap
@@ -14,7 +14,7 @@ function NewChrom = mutation(OldChrom, MUT_F, OPT_F, Data, Pm)
     for i = 1:Nind
         % If mutate, then to the local best value. Use optimization skills.
         if DoMutate(i)
-            NewChrom(i, :) = feval(OPT_F, OldChrom(i, :), MUT_F, Data);
+            NewChrom(i, :) = feval(OPT_F, OldChrom(i, :), MUT_F, Data, Iter);
         end
     end
         
