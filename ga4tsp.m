@@ -18,8 +18,8 @@ function [bestx, optimal] = ga4tsp(Data)
     InsertOption = 1; % 0 for uniform choice, 1 for fitness value, 2 for ratio value
     
     % Configuration.Mutation
-    MUT_Function = 'newm2opt'; % swap, scramble, m2opt, m3opt, m4opt
-    OPT_Function = 'newhlclb'; % hlclb, sa
+    MUT_Function = 'm2opt'; % swap, scramble, m2opt, m3opt, m4opt
+    OPT_Function = 'hlclb'; % hlclb, sa
     OPT_MaxIteration = 100;
     MutationProb = 0.1;
     
