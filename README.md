@@ -75,9 +75,13 @@ For Mathematical Modeling Contest in September. These are useful tools we may us
   * **Notice: Those algorithms are based on the paper: *Genetic algorithms for the traveling salesman problem, Jean-Yves Potvin, Annals of Operations Research 63(1996)339-370***. Deep appreciation for that.
 
 ## Changelog:
+### Version 1.4.1
+  * Add variable *OPT_MaxIteration* to set maximum iteration for optimization. (*hlclb*)
+  * Change *ga4tsp*(main), *optmutate*, *mutation*, *hlclb* parameters according to the new feature.
+  * **Notice: There will be another beta test to shorten calculation time. We will release it soon.**
 ### Version 1.4
   * Fix a bug in *hlclb* function.
-  * *REC_Template* function is deprecated from now on.
+  * *REC_Template* function is deprecated from now on. And 6 crossover functions are provided instead.
   * Reduce dependency for *gatbx*
 ### Version 1.3
   * Modify the *dist* function and add a new function *gentable* to save time. (-50%)
@@ -86,7 +90,6 @@ For Mathematical Modeling Contest in September. These are useful tools we may us
   * Integrate mutation and optimization to one function. Operation time has been greatly shortened.
   * Remove these functions: **mutate.m**, **opt2.m**, etc. to save space.
   * Add 2-opt, 3-opt, 4-opt, hill-climbing, simulated annealing feature in the integration.
-  * **Notice: REC_Template, intercross function will be very likely deprecated in the future.**
 ### Version 1.1-beta
   * Add 2-top feature.
   * Change some parameters according to the new feature.
