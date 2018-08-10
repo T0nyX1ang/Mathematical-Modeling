@@ -75,16 +75,22 @@ For Mathematical Modeling Contest in September. These are useful tools we may us
   * **Notice: Those algorithms are based on the paper: *Genetic algorithms for the traveling salesman problem, Jean-Yves Potvin, Annals of Operations Research 63(1996)339-370***. Deep appreciation for that.
 
 ## Changelog:
+### Version 1.5-beta1
+  * Add two new testing functions: *newhlclb* and *newm2opt* to shorten calculation time. (17% ~ 20%)
+  * **Note**:The way to calculate distances are changed here because we find out that calculating change with the nodes can be faster than calculating the solution. (less function calls)
+  * **Notice:** 
+    1. It's interesting to say that we are surely closer to the classical Lin-Kernighan heuristic algorithm. 
+    2. There will be lots of beta test versions from now on.
+    3. To apply this update, you need to change the function call in *ga4tsp*: *MUT_Function* should be set to *newm2opt*, *OPT_Function* should be set to *newhlclb*. 
 ### Version 1.4.1
   * Add variable *OPT_MaxIteration* to set maximum iteration for optimization. (*hlclb*)
   * Change *ga4tsp*(main), *optmutate*, *mutation*, *hlclb* parameters according to the new feature.
-  * **Notice: There will be another beta test to shorten calculation time. We will release it soon.**
 ### Version 1.4
   * Fix a bug in *hlclb* function.
   * *REC_Template* function is deprecated from now on. And 6 crossover functions are provided instead.
   * Reduce dependency for *gatbx*
 ### Version 1.3
-  * Modify the *dist* function and add a new function *gentable* to save time. (-50%)
+  * Modify the *dist* function and add a new function *gentable* to save time. (50%)
   * Change all the functions involving *dist* function.
 ### Version 1.2
   * Integrate mutation and optimization to one function. Operation time has been greatly shortened.
