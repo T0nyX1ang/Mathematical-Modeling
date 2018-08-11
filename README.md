@@ -75,8 +75,11 @@ For Mathematical Modeling Contest in September. These are useful tools we may us
   * **Notice: Those algorithms are based on the paper: *Genetic algorithms for the traveling salesman problem, Jean-Yves Potvin, Annals of Operations Research 63(1996)339-370***. Deep appreciation for that.
 
 ## Changelog:
+### Version 1.5.1-beta2
+  * Add one testing functions: *newm3opt* to enhance search performance. 
+  * To apply this update, you need to change the function call in *ga4tsp*: *MUT_Function* should be set to *newmeopt*, *OPT_Function* should be set to *newhlclb*. 
 ### Version 1.5-beta1
-  * Add two new testing functions: *newhlclb* and *newm2opt* to shorten calculation time. (17% ~ 20%)
+  * Add two testing functions: *newhlclb* and *newm2opt* to shorten calculation time. (17% ~ 20%)
   * **Note**:The way to calculate distances are changed here because we find out that calculating change with the nodes can be faster than calculating the solution. (less function calls)
   * **Notice:** 
     1. It's interesting to say that we are surely closer to the classical Lin-Kernighan heuristic algorithm. 
