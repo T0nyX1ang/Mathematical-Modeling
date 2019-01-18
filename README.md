@@ -1,9 +1,10 @@
 # Mathematical-Modeling
-For Mathematical Modeling Contest in September.
+My mathematical modeling tool collection.
 
 # Contents
-  * MATLAB Exercises
-  * Useful Tools
+  * MATLAB exercises
+  * Useful tools
+  * Useful algorithms
   * Modules within Tools **(Make sure you put those modules into your working directory!)**
 
 # Notice
