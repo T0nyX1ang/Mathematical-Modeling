@@ -1,5 +1,6 @@
 # Mathematical-Modeling
-For Mathematical Modeling Contest in September. These are useful tools we may use.
+These are useful tools we may use.
+
 # ezga.m
 ## Demonstration:
   * Using *Sheffield University's GA Toolbox* [http://codem.group.shef.ac.uk/index.php/ga-toolbox] to optimize minimum searching of a function. There are two other functions to accomplish the *elitist* method. There are *eltselect* and *eltchange*. 
