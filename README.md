@@ -2,4 +2,5 @@
 My mathematical modeling algorithm collection.
 
 # Contents
-  * MATLAB Algorithms.
+  * MATLAB graph theory algorithms.
+  * MATLAB optimization algorithms.
