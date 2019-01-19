@@ -3,8 +3,9 @@ My mathematical modeling tool collection.
 
 # Contents
   * MATLAB exercises
-  * Useful tools
-  * Useful algorithms
+  * Useful genetic algorithms
+  * Useful graph theory algorithms
+  * Useful optimization tools
   * Modules within Tools **(Make sure you put those modules into your working directory!)**
 
 # Notice
