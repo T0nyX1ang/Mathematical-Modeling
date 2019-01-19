@@ -1,5 +1,5 @@
 # Mathematical-Modeling
-These are useful tools we may use.
+These are optimization tools based on genetic algorithm(or other self-adaptive algorithms).
 
 # ezga.m
 ## Demonstration:
