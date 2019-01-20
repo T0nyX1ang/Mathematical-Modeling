@@ -1,7 +1,7 @@
 function point = searchInterp(funct, start, stop, epsilon)
     % 1-d search with interpolation method
     if (epsilon < 0)
-        error("epsilonilon must be greater than 0.");
+        error("epsilon must be greater than 0.");
     end
     
     tangent = getTangent(funct);
