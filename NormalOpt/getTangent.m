@@ -24,7 +24,7 @@ function tanFunct = getTangent(funct, dimension)
         while (diff_str(pivot) ~= ')')
             pivot = pivot + 1;
         end
-        diff_str = strrep(diff_str, diff_str(3:pivot - 1), "x");
+        diff_str = strrep(diff_str, diff_str(2:pivot), "(x)");
         for j = 1:dimension
             diff_str = strrep(diff_str, "x" + num2str(j), "x(" + num2str(j) + ")");
         end
