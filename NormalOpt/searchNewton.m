@@ -6,12 +6,12 @@ function point = searchNewton(funct, initial, epsilon)
     end
     
     tangent = getTangent(funct);
-    doubletangent = getTangent(tangent);
-    while (abs(tangent(initial)) >= epsilon)
-        if (doubletangent(initial) < epsilon)
+    doubletangent = getDoubleTangent(funct);
+    while (abs(tangent{1}(initial)) >= epsilon)
+        if (doubletangent{1, 1}(initial) < epsilon)
             warning("Bad conditioned tangent");
         end
-        initial = initial - tangent(initial) ./ doubletangent(initial);
+        initial = initial - tangent{1}(initial) ./ doubletangent{1, 1}(initial);
     end
     
     point = initial;
