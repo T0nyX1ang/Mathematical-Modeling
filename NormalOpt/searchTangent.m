@@ -8,9 +8,9 @@ function point = searchTangent(funct, start, stop, epsilon)
     end
     
     tangent = getTangent(funct);
-    while (abs(tangent(stop)) >= epsilon)
+    while (abs(tangent{1}(stop)) >= epsilon)
         temp = stop;
-        stop = stop - (stop - start) / (tangent(stop) - tangent(start)) * tangent(stop);
+        stop = stop - (stop - start) / (tangent{1}(stop) - tangent{1}(start)) * tangent{1}(stop);
         start = temp;
     end
     
