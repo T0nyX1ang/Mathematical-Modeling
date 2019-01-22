@@ -18,13 +18,13 @@ function [xval, fval] = FastestDecrease(funct, initial, epsilon, step)
     dimension = size(initial, 2);
     xval = initial;
     tangent = getTangent(funct, dimension);
-    tval = getTangentValue(tangent, xval);
+    tval = -getTangentValue(tangent, xval);
     while (norm(tval) >= epsilon)
         dec_funct = @(lambda) funct(xval + lambda * tval);
         [start, stop] = searchValidInterval(dec_funct, 0, step);
         lambda = searchGoldenMean(dec_funct, start, stop, epsilon);
         xval = xval + lambda * tval;
-        tval = getTangentValue(tangent, xval);
+        tval = -getTangentValue(tangent, xval);
     end
     
     fval = funct(xval);
