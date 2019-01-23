@@ -1,4 +1,4 @@
-function [xval, fval] = ConjugateGradient(funct, initial, epsilon)
+function [xval, fval] = ConjugateGradient(funct, initial, epsilon, step)
     % An implementation conjugate gradient (CG-FR) method.
     % epsilon: error value
     % step: search step when finding a valid interval
