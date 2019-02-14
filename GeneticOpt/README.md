@@ -44,7 +44,7 @@ These are optimization tools based on genetic algorithm(or other self-adaptive a
 
 # ga4tsp.m
 ## Demonstration:
-  * This is the first STSP (symmetric traveling salesman problem) solver that we make. We design it under **ezga** and *GA Toolbox* mentioned before. Unlike the original **ezga**, the population structure, recombination function and mutation function need to be changed. Therefore, we add three major changes in the original *GA Toolbox*. There are *crtperm*, *intercross* and *mutation*. And there is 1 template connectors to help you link those methods to the original *GA Toolbox* which is called *REC_Template*. We integrate mutation and optimization to save time. Finally, there is a file to calculate the distance called *dist*. To save time, we use a function named *gentable* to pre-calculate those distances.
+  * This is the first STSP (symmetric traveling salesman problem) solver that we make. We design it under **ezga** and *GA Toolbox* mentioned before. Unlike the original **ezga**, the population structure, recombination function and mutation function need to be changed. Therefore, we add three major changes in the original *GA Toolbox*. There are *crtpermp*, *intercross* and *mutation*. Finally, there is a file to calculate the distance called *dist*. To save time, we use a function named *gentable* to pre-calculate those distances.
 
 ## Function List:
   * ***crtpermp*** is for generating a permutational population. (*e.g.* [2 3 1 4 5 8 6 7] as an individual of 8 characters)
