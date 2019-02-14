@@ -73,5 +73,10 @@ function [xval, fval] = SimplexMethod(c, A, b)
     % re-calculate conditional number
     table = [table; zeros(1, size(table, 2))]; % make room first
     table(end, end) = c * initX;
+    inX = inX(inX > 0);
+    w = c(inX) / table(1: end - 1, inX); % get factor w
+    for j = 1: size(table, 2) - 1
+        table(end, j) = w * table(1: end - 1, j) - c(j);
+    end
     table
 end
