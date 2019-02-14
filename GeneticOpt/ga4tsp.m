@@ -14,7 +14,7 @@ function [bestx, optimal] = ga4tsp(Data)
     %Elitist = SUBPOP;
     
     % Configuration.Recombination
-    REC_Function = 'hx'; % pmx, cx, ox, obx, pbx, er
+    REC_Function = 'er'; % pmx, cx, ox, obx, pbx, er
     InsertOption = 1; % 0 for uniform choice, 1 for fitness value, 2 for ratio value
     
     % Configuration.Mutation
