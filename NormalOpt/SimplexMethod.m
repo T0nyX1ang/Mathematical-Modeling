@@ -21,10 +21,16 @@ function [xval, fval] = SimplexMethod(c, A, b)
     % Pivot, step by step
     [val, cind] = max(extTable(end, 1: end - 1));
     while (val > 0)
-        col = extTable(1:end - 1, end) ./ extTable(1: end - 1, cind);
-        greater = find(col > 0);
-        [~, row] = min(col(greater)); 
-        rind = greater(row); % find row index
+        minval = inf;
+        for i = 1:size(extTable, 1) - 1
+            if (extTable(i, cind) >= 0)
+                val = extTable(i, end) / extTable(i, cind);
+                if (val < minval)
+                    minval = val;
+                    rind = i; % find row index
+                end
+            end
+        end
         point = extTable(rind, cind); % find the point
         inX(rind) = cind; % calculate inner columns at the same time
         extTable(rind, :) = extTable(rind, :) ./ point;
