@@ -1,7 +1,13 @@
-function [xval, fval] = SimplexMethod(c, A, b)
+function [xval, fval] = SimplexMethod(c, A, b, epsilon)
     % Simplex method for linear programming.
     % This program is to solve functions like:
     % min f = cx such that Ax = b, x >= 0, b >= 0
+    % c, A, b: equation above
+    % epsilon: error value when calculating a valid point
+    
+    if (nargin == 3)
+        epsilon = 1e-6;
+    end
 
     if (size(c, 2) ~= size(A, 2)) || (size(c, 1) ~= 1) || ...
        (size(A, 1) ~= size(b, 1)) || (size(b, 2) ~= 1)
@@ -42,7 +48,7 @@ function [xval, fval] = SimplexMethod(c, A, b)
         end
         [val, cind] = max(extTable(end, 1: end - 1));
     end
-    if (extTable(end, end) ~= 0)
+    if (abs(extTable(end, end)) >= epsilon)
         error("Unable to find a valid initial point.");
     else
         tempX = zeros(size(extTable, 2), 1);
@@ -78,5 +84,32 @@ function [xval, fval] = SimplexMethod(c, A, b)
     for j = 1: size(table, 2) - 1
         table(end, j) = w * table(1: end - 1, j) - c(j);
     end
-    table
+    % Pivot, step by step
+    [val, cind] = max(table(end, 1: end - 1));
+    while (val > 0)
+        minval = inf;
+        for i = 1:size(table, 1) - 1
+            if (table(i, cind) >= 0)
+                val = table(i, end) / table(i, cind);
+                if (val < minval)
+                    minval = val;
+                    rind = i; % find row index
+                end
+            end
+        end
+        point = table(rind, cind); % find the point
+        inX(rind) = cind; % calculate inner columns at the same time
+        table(rind, :) = table(rind, :) ./ point;
+        % Elimination
+        for i = 1:size(table, 1)
+            if (i ~= rind)
+                table(i, :) = table(i, :) - table(i, cind) .* table(rind, :); 
+            end
+        end
+        [val, cind] = max(table(end, 1: end - 1));
+    end
+    tempX = zeros(size(table, 2), 1);
+    tempX(inX) = table(1: end - 1, end);
+    xval = tempX(1: size(c, 2)); % get initial point of original LP
+    fval = table(end, end);
 end
