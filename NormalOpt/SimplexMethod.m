@@ -49,5 +49,29 @@ function [xval, fval] = SimplexMethod(c, A, b)
         tempX(inX) = extTable(1: end - 1, end);
         initX = tempX(1: size(c, 2)); % get initial point of original LP
     end
-    initX 
+    % change extTable to let useful vectors in
+    for i = 1: size(A, 1)
+        if (inX(i) > size(c, 2)) % move condition
+            ckey = find(extTable(i, 1: size(c, 2)) ~= 0, 1);
+            if (~isempty(ckey)) % get the key, apply the change
+                point = extTable(i, ckey);
+                inX(i) = ckey;
+                extTable(i, :) = extTable(i, :) ./ point;
+                % Elimination without the bottom
+                for j = 1:size(extTable, 1) - 1
+                    if (j ~= i)
+                        extTable(j, :) = extTable(j, :) - extTable(j, ckey) .* extTable(i, :); 
+                    end
+                end
+            else % don't get the key, remove the line
+                warning("Surplus condition found. Removing it.")
+                inX(i) = -1; % Tag the key
+            end
+        end
+    end
+    table = extTable(inX > 0, [1: size(A, 2), end]); % construct table
+    % re-calculate conditional number
+    table = [table; zeros(1, size(table, 2))]; % make room first
+    table(end, end) = c * initX;
+    table
 end
