@@ -1,4 +1,4 @@
-function [xval, fval] = UniformSimplexConnector(c, A, b, Aeq, beq, lb, ub, eps)
+function [xval, fval] = UniformSimplexConnector(c, A, b, Aeq, beq, lb, ub, epsilon)
     % Uniform simplex connector for simplex method.
     % Solves problem like:
     % min f = cx, such that A * x <= b, Aeq * x = beq, lb <= x <= ub
@@ -7,11 +7,11 @@ function [xval, fval] = UniformSimplexConnector(c, A, b, Aeq, beq, lb, ub, eps)
 
     % Autofill
     if (nargin == 3)
-        Aeq = []; beq = []; lb = []; ub = []; eps = 1e-6;
+        Aeq = []; beq = []; lb = []; ub = []; epsilon = 1e-6;
     elseif (nargin == 5)
-        lb = []; ub = []; eps = 1e-6;
+        lb = []; ub = []; epsilon = 1e-6;
     elseif (nargin == 7)
-        eps = 1e-6;
+        epsilon = 1e-6;
     end
     
     % Validate
@@ -97,6 +97,10 @@ function [xval, fval] = UniformSimplexConnector(c, A, b, Aeq, beq, lb, ub, eps)
             Aeq = [Aeq, zeros(size(Aeq, 1), 1)];
         end
     end
-    c
-    check = [A, b; Aeq, beq]
+    
+    % Solve the LP using the core simplex method module
+    [xval, fval] = SimplexMethod(c, [A; Aeq], [b; beq], epsilon);
+    xval
+    fval
+    
 end
