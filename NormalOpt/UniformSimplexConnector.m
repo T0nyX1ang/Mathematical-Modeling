@@ -15,12 +15,13 @@ function [xval, fval] = UniformSimplexConnector(c, A, b, Aeq, beq, lb, ub, epsil
     end
     
     % Validate
-    if (size(c, 2) ~= size(A, 2)) || (size(c, 1) ~= 1) || ...
-       (size(A, 1) ~= size(b, 1)) || (size(b, 2) ~= 1) || ...
+    if (~isempty(A) && ~isempty(b) && ... 
+       ((size(c, 2) ~= size(A, 2)) || (size(c, 1) ~= 1) || ...
+       (size(A, 1) ~= size(b, 1)) || (size(b, 2) ~= 1))) || ...
        (~isempty(Aeq) && ~isempty(beq) && ((size(c, 2) ~= size(Aeq, 2)) || ...
        (size(Aeq, 1) ~= size(beq, 1)) || (size(beq, 2) ~= 1))) || ...
-       (~isempty(lb) && ~isempty(ub) && ((size(lb, 1) ~= 1) || (size(ub, 1) ~= 1) || ...
-       (size(lb, 2) ~= size(c, 2)) || (size(ub, 2) ~= size(c, 2))))
+       (~isempty(lb) && (size(lb, 1) ~= 1 || size(lb, 2) ~= size(c, 2))) || ...
+       (~isempty(ub) && (size(ub, 1) ~= 1 || size(ub, 2) ~= size(c, 2)))
         error("Invalid matrix.");
     end
     
@@ -52,7 +53,12 @@ function [xval, fval] = UniformSimplexConnector(c, A, b, Aeq, beq, lb, ub, epsil
             movement_table(1, i) = 0;
             movement_table(2, i) = -1;
             % Add constraint for full bounded condition
-            b(:) = b(:) + A(:, i) * lb(i);
+            if (~isempty(A))
+                b(:) = b(:) + A(:, i) * lb(i);
+            end
+            if (~isempty(Aeq))
+                beq(:) = beq(:) + Aeq(:, i) * lb(i);
+            end
             temprow = zeros(size(c));
             temprow(i) = 1;
             A = [A; temprow];
@@ -60,26 +66,39 @@ function [xval, fval] = UniformSimplexConnector(c, A, b, Aeq, beq, lb, ub, epsil
         elseif (lb(i) ~= -inf) && (ub(i) == +inf)
             movement_table(1, i) = 1;
             movement_table(2, i) = -1;
-            b(:) = b(:) + A(:, i) * lb(i); 
+            if (~isempty(A))
+                b(:) = b(:) + A(:, i) * lb(i);
+            end
+            if (~isempty(Aeq))
+                beq(:) = beq(:) + Aeq(:, i) * lb(i);
+            end 
         elseif (lb(i) == -inf) && (ub(i) ~= +inf)
             movement_table(1, i) = 2;
             movement_table(2, i) = -1;
-            b(:) = b(:) - A(:, i) * ub(i);
-            A(:, i) = -A(:, i);
+            if (~isempty(A))
+                b(:) = b(:) - A(:, i) * ub(i);
+                A(:, i) = -A(:, i);
+            end
+            if (~isempty(Aeq))
+                beq(:) = beq(:) - Aeq(:, i) * ub(i);
+                Aeq(:, i) = -Aeq(:, i);
+            end
         elseif (lb(i) == -inf) && (ub(i) == +inf)
             movement_table(1, i) = 3;
             movement_table(2, i) = place;
             place = place + 1;
             % Add variable for unbounded condition
             c = [c, 0];
-            A = [A, -A(:, i)];
+            if (~isempty(A))
+                A = [A, -A(:, i)];
+            end
             if (~isempty(Aeq))
                 Aeq = [Aeq, -Aeq(:, i)];
             end
         end
     end
     
-    % Add surplus variables for inequalities
+    % Add surplus variables for inequalities and make it stardardized
     for i = 1: size(A, 1)
         tempcol = zeros(size(A, 1), 1);
         if b(i) < 0
@@ -95,6 +114,14 @@ function [xval, fval] = UniformSimplexConnector(c, A, b, Aeq, beq, lb, ub, epsil
         end
         if (~isempty(Aeq))
             Aeq = [Aeq, zeros(size(Aeq, 1), 1)];
+        end
+    end
+    
+    % Make equality constraints startardized
+    for i = 1: size(Aeq, 1)
+        if (beq(i) < 0)
+            Aeq(i, :) = -Aeq(1, :);
+            beq(i) = -beq(i);
         end
     end
     
