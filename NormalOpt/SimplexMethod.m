@@ -26,7 +26,7 @@ function [xval, fval] = SimplexMethod(c, A, b, epsilon)
     end
     % Pivot, step by step
     [val, cind] = max(extTable(end, 1: end - 1));
-    while (val >= epsilon)
+    while (val > 0)
         minval = inf;
         for i = 1:size(extTable, 1) - 1
             if (extTable(i, cind) >= 0)
@@ -89,7 +89,7 @@ function [xval, fval] = SimplexMethod(c, A, b, epsilon)
     end
     % Pivot, step by step
     [val, cind] = max(table(end, 1: end - 1));
-    while (val >= epsilon)
+    while (val > 0)
         minval = inf;
         for i = 1:size(table, 1) - 1
             if (table(i, cind) >= 0)
