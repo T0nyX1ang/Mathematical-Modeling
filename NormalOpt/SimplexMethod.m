@@ -37,6 +37,9 @@ function [xval, fval] = SimplexMethod(c, A, b, epsilon)
                 end
             end
         end
+        if (isinf(minval))
+            error("Unable to find a valid initial point.");
+        end
         point = extTable(rind, cind); % find the point
         inX(rind) = cind; % calculate inner columns at the same time
         extTable(rind, :) = extTable(rind, :) ./ point;
@@ -96,6 +99,9 @@ function [xval, fval] = SimplexMethod(c, A, b, epsilon)
                     rind = i; % find row index
                 end
             end
+        end
+        if (isinf(minval))
+            error("This problem is unbounded.")
         end
         point = table(rind, cind); % find the point
         inX(rind) = cind; % calculate inner columns at the same time
