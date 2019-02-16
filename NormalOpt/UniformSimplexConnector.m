@@ -10,6 +10,8 @@ function [xval, fval] = UniformSimplexConnector(c, A, b, Aeq, beq, lb, ub, epsil
         Aeq = []; beq = []; lb = []; ub = []; epsilon = 1e-6;
     elseif (nargin == 5)
         lb = []; ub = []; epsilon = 1e-6;
+    elseif (nargin == 6)
+        ub = []; epsilon = 1e-6;
     elseif (nargin == 7)
         epsilon = 1e-6;
     end
@@ -43,7 +45,7 @@ function [xval, fval] = UniformSimplexConnector(c, A, b, Aeq, beq, lb, ub, epsil
     % value n for place n
     % value -1 for not taking a place
     
-    movement_table = zeros(3, size(c, 2));
+    movement_table = zeros(2, size(c, 2));
     place = size(c, 2) + 1;
     for i = 1: size(c, 2)
         if (ub(i) - lb(i) < 0)
@@ -126,8 +128,18 @@ function [xval, fval] = UniformSimplexConnector(c, A, b, Aeq, beq, lb, ub, epsil
     end
     
     % Solve the LP using the core simplex method module
-    [xval, fval] = SimplexMethod(c, [A; Aeq], [b; beq], epsilon);
-    xval
-    fval
+    [tempxval, fval] = SimplexMethod(c, [A; Aeq], [b; beq], epsilon);
+
+    % From movement_table to recover final value
+    for i = 1: size(movement_table, 2)
+        switch (movement_table(1, i))
+            case {0, 1}
+                xval(i) = tempxval(i) + lb(i);
+            case 2
+                xval(i) = ub(i) - tempxval(i);
+            case 3
+                xval(i) = tempxval(i) - tempxval(movement_table(2, i));
+        end
+    end
     
 end
