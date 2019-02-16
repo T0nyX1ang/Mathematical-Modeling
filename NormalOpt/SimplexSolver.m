@@ -1,5 +1,5 @@
-function [xval, fval] = UniformSimplexConnector(c, A, b, Aeq, beq, lb, ub, epsilon)
-    % Uniform simplex connector for simplex method.
+function [xval, fval] = SimplexSolver(c, A, b, Aeq, beq, lb, ub, epsilon)
+    % Uniform simplex solver for simplex method.
     % Solves problem like:
     % min f = cx, such that A * x <= b, Aeq * x = beq, lb <= x <= ub
     % epsilon: error value when calculating a valid point
