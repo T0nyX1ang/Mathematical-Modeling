@@ -15,6 +15,7 @@ function [xval, fval] = UniformSimplexConnector(c, A, b, Aeq, beq, lb, ub, epsil
     elseif (nargin == 7)
         epsilon = 1e-6;
     end
+    origC = c;
     
     % Validate
     if (~isempty(A) && ~isempty(b) && ... 
@@ -22,17 +23,17 @@ function [xval, fval] = UniformSimplexConnector(c, A, b, Aeq, beq, lb, ub, epsil
        (size(A, 1) ~= size(b, 1)) || (size(b, 2) ~= 1))) || ...
        (~isempty(Aeq) && ~isempty(beq) && ((size(c, 2) ~= size(Aeq, 2)) || ...
        (size(Aeq, 1) ~= size(beq, 1)) || (size(beq, 2) ~= 1))) || ...
-       (~isempty(lb) && (size(lb, 1) ~= 1 || size(lb, 2) ~= size(c, 2))) || ...
-       (~isempty(ub) && (size(ub, 1) ~= 1 || size(ub, 2) ~= size(c, 2)))
+       (~isempty(lb) && (size(lb, 2) ~= 1 || size(lb, 1) ~= size(c, 2))) || ...
+       (~isempty(ub) && (size(ub, 2) ~= 1 || size(ub, 1) ~= size(c, 2)))
         error("Invalid matrix.");
     end
     
     % Integrate lowerbounds and upperbounds into constraints
     if (isempty(lb))
-        lb = -inf(size(c));
+        lb = -inf(size(c))';
     end
     if (isempty(ub))
-        ub = +inf(size(c));
+        ub = +inf(size(c))';
     end
     
     % create movement table for recovering the data later
@@ -77,6 +78,7 @@ function [xval, fval] = UniformSimplexConnector(c, A, b, Aeq, beq, lb, ub, epsil
         elseif (lb(i) == -inf) && (ub(i) ~= +inf)
             movement_table(1, i) = 2;
             movement_table(2, i) = -1;
+            c(i) = -c(i);
             if (~isempty(A))
                 b(:) = b(:) - A(:, i) * ub(i);
                 A(:, i) = -A(:, i);
@@ -90,7 +92,7 @@ function [xval, fval] = UniformSimplexConnector(c, A, b, Aeq, beq, lb, ub, epsil
             movement_table(2, i) = place;
             place = place + 1;
             % Add variable for unbounded condition
-            c = [c, 0];
+            c = [c, -c(i)];
             if (~isempty(A))
                 A = [A, -A(:, i)];
             end
@@ -128,8 +130,9 @@ function [xval, fval] = UniformSimplexConnector(c, A, b, Aeq, beq, lb, ub, epsil
     end
     
     % Solve the LP using the core simplex method module
-    [tempxval, fval] = SimplexMethod(c, [A; Aeq], [b; beq], epsilon);
+    [tempxval, ~] = SimplexMethod(c, [A; Aeq], [b; beq], epsilon);
 
+    xval = nan(size(origC, 2), 1);
     % From movement_table to recover final value
     for i = 1: size(movement_table, 2)
         switch (movement_table(1, i))
@@ -141,5 +144,6 @@ function [xval, fval] = UniformSimplexConnector(c, A, b, Aeq, beq, lb, ub, epsil
                 xval(i) = tempxval(i) - tempxval(movement_table(2, i));
         end
     end
+    fval = origC * xval;
     
 end
