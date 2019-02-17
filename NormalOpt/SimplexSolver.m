@@ -106,7 +106,7 @@ function [xval, fval] = SimplexSolver(c, A, b, Aeq, beq, lb, ub, epsilon)
     for i = 1: size(A, 1)
         tempcol = zeros(size(A, 1), 1);
         if b(i) < 0
-            A(i, :) = -A(1, :);
+            A(i, :) = -A(i, :);
             b(i) = -b(i);
             tempcol(i) = -1;
             A = [A, tempcol];
@@ -124,7 +124,7 @@ function [xval, fval] = SimplexSolver(c, A, b, Aeq, beq, lb, ub, epsilon)
     % Make equality constraints startardized
     for i = 1: size(Aeq, 1)
         if (beq(i) < 0)
-            Aeq(i, :) = -Aeq(1, :);
+            Aeq(i, :) = -Aeq(i, :);
             beq(i) = -beq(i);
         end
     end
