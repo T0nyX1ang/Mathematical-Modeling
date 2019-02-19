@@ -57,10 +57,10 @@ function [xval, fval] = SimplexSolver(c, A, b, Aeq, beq, lb, ub, epsilon)
             movement_table(2, i) = -1;
             % Add constraint for full bounded condition
             if (~isempty(A))
-                b(:) = b(:) + A(:, i) * lb(i);
+                b(:) = b(:) - A(:, i) * lb(i);
             end
             if (~isempty(Aeq))
-                beq(:) = beq(:) + Aeq(:, i) * lb(i);
+                beq(:) = beq(:) - Aeq(:, i) * lb(i);
             end
             temprow = zeros(size(c));
             temprow(i) = 1;
@@ -70,10 +70,10 @@ function [xval, fval] = SimplexSolver(c, A, b, Aeq, beq, lb, ub, epsilon)
             movement_table(1, i) = 1;
             movement_table(2, i) = -1;
             if (~isempty(A))
-                b(:) = b(:) + A(:, i) * lb(i);
+                b(:) = b(:) - A(:, i) * lb(i);
             end
             if (~isempty(Aeq))
-                beq(:) = beq(:) + Aeq(:, i) * lb(i);
+                beq(:) = beq(:) - Aeq(:, i) * lb(i);
             end 
         elseif (lb(i) == -inf) && (ub(i) ~= +inf)
             movement_table(1, i) = 2;
