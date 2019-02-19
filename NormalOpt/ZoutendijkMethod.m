@@ -1,7 +1,7 @@
 function [xval, fval] = ZoutendijkMethod(funct, initial, A, b, Aeq, beq, eps, step)
     % Zoutendijk method for NLP with linear constraints
     % Solving problem like:
-    % min f(x) such that A x' >= b, Aeq x' = beq.
+    % min f(x) such that A * x' >= b, Aeq * x' = beq.
     % eps is overall error value
     % step: search step when finding a valid interval
     
@@ -62,7 +62,7 @@ function [xval, fval] = ZoutendijkMethod(funct, initial, A, b, Aeq, beq, eps, st
         A1 = A(equal, :);
         %b1 = b(equal, :);
         % Solve LP to get d
-        [d, ~] = SimplexSolver(tval, -A1, zeros(size(A1, 2), 1), Aeq, zeros(size(Aeq, 2), 1), ...
+        [d, ~] = SimplexSolver(tval, -A1, zeros(size(A1, 1), 1), Aeq, zeros(size(Aeq, 1), 1), ...
                                -ones(dimension, 1), ones(dimension, 1), eps);
     end
     
