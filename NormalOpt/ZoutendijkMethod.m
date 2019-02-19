@@ -22,7 +22,7 @@ function [xval, fval] = ZoutendijkMethod(funct, initial, A, b, Aeq, beq, eps, st
             error("Invalid inequality condition.");
         end
     end
-    if (~isempty(Aeq) && (Aeq * t_xval ~= beq))
+    if (~isempty(Aeq) && (norm(Aeq * t_xval - beq) >= eps))
         error("Invalid equality condition.");
     end
 
@@ -36,21 +36,34 @@ function [xval, fval] = ZoutendijkMethod(funct, initial, A, b, Aeq, beq, eps, st
     A1 = A(equal, :);
     %b1 = b(equal, :);
     % Solve LP to get d
-    [d, ~] = SimplexSolver(tval, -A1, zeros(size(A1, 2), 1), Aeq, zeros(size(Aeq, 2), 1), ...
+    [d, ~] = SimplexSolver(tval, -A1, zeros(size(A1, 1), 1), Aeq, zeros(size(Aeq, 1), 1), ...
                            -ones(dimension, 1), ones(dimension, 1), eps);
     
     while (norm(tval * d) >= eps)
         % Calculate maximum step range
         b_bar = b2 - A2 * t_xval;
         d_bar = A2 * d;
-        inf_col = ones(size(b_bar));
-        inf_col(d_bar >= 0) = inf;
-        lambda_max = min(b_bar ./ d_bar .* inf_col);
+        lambda_max = inf;
+        for i = 1: size(b_bar, 2)
+            temp_lambda = b_bar(i) / d_bar(i);
+            if (temp_lambda > 0) && (temp_lambda < lambda_max)
+                lambda_max = temp_lambda;
+            end
+        end
+        if (lambda_max < eps)
+            warning("Step is very near 0. Solution might be inaccurate.");
+        end
         % minimize function value
         dec_funct = @(lambda) funct(t_xval' + lambda * d');
         [start, stop] = searchValidInterval(dec_funct, 0, step);
-        start = start * (start > 0);
-        stop = lambda_max + (stop - lambda_max) * (stop < lambda_max);
+        if (start < lambda_max) % naturally find one interval
+            start = start * (start > 0);
+            if (stop > lambda_max)
+                stop = lambda_max;
+            end
+        else % use a fixed interval
+            start = 0; stop = 1;
+        end
         lambda = searchGoldenMean(dec_funct, start, stop, eps);
         t_xval = t_xval + lambda * d;
         tval = getTangentValue(tangent, t_xval');
