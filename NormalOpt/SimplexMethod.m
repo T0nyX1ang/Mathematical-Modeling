@@ -29,7 +29,7 @@ function [xval, fval] = SimplexMethod(c, A, b, epsilon)
     while (val > 0)
         minval = inf;
         for i = 1:size(extTable, 1) - 1
-            if (extTable(i, cind) >= 0)
+            if (extTable(i, cind) * inf >= 0)
                 val = extTable(i, end) / extTable(i, cind);
                 if (val < minval)
                     minval = val;
@@ -92,7 +92,7 @@ function [xval, fval] = SimplexMethod(c, A, b, epsilon)
     while (val > 0)
         minval = inf;
         for i = 1:size(table, 1) - 1
-            if (table(i, cind) >= 0)
+            if (table(i, cind) * inf >= 0)
                 val = table(i, end) / table(i, cind);
                 if (val < minval)
                     minval = val;
