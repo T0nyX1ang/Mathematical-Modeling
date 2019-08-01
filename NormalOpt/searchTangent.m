@@ -1,6 +1,6 @@
 function point = searchTangent(funct, start, stop, epsilon)
     % 1-d search with tangent method
-    if (epsilon < 0)
+    if (epsilon <= 0)
         error("epsilon must be greater than 0.");
     end
     if (stop < start)
