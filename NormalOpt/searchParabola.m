@@ -1,7 +1,7 @@
 function point = searchParabola(funct, start, mid, stop, epsilon)
     % 1-d search with parabola function method
     % function must contain ONLY ONE MINIMUM.
-    if (epsilon < 0)
+    if (epsilon <= 0)
         error("epsilon must be greater than 0.");
     end
     
