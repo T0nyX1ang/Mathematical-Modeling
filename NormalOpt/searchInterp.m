@@ -1,6 +1,6 @@
 function point = searchInterp(funct, start, stop, epsilon)
     % 1-d search with interpolation method
-    if (epsilon < 0)
+    if (epsilon <= 0)
         error("epsilon must be greater than 0.");
     end
     
@@ -9,7 +9,7 @@ function point = searchInterp(funct, start, stop, epsilon)
         error("Invalid initial condition");
     end
     
-    while (abs(stop - start) > epsilon)
+    while (abs(stop - start) >= epsilon)
         s = 3 * (funct(stop) - funct(start)) / (stop - start);
         z = s - tangent{1}(stop) - tangent{1}(start);
         w = sqrt(z .^ 2 - tangent{1}(start) .* tangent{1}(stop));
