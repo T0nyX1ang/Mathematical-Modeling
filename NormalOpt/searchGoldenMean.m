@@ -1,7 +1,7 @@
 function point = searchGoldenMean(funct, start, stop, epsilon)
     % 1-d search with Golden-Mean method
     % function must contain ONLY ONE MINIMUM.
-    if (epsilon < 0)
+    if (epsilon <= 0)
         error("epsilon must be greater than 0.");
     end
     if (stop < start)
