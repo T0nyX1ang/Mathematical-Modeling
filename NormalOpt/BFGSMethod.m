@@ -29,11 +29,11 @@ function [xval, fval] = BFGSMethod(funct, initial, epsilon, step, initialMatrix)
     tval = getTangentValue(tangent, xval);
     Hval = initialMatrix;
     count = 0;
-    while (norm(tval) >= epsilon)
+    lambda = +inf;
+    while (norm(tval) >= epsilon) && (lambda > 0)
         dval = -tval * Hval;
         dec_funct = @(lambda) funct(xval + lambda * dval);
-        [start, stop] = searchValidInterval(dec_funct, 0, step);
-        lambda = searchGoldenMean(dec_funct, start, stop, epsilon);
+        lambda = UniversalSearch(dec_funct, 0, epsilon, step, 'goldenmean', 0, +inf);
         if (count < dimension)
             prev_xval = xval;
             prev_tval = tval;
