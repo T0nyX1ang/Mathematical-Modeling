@@ -4,6 +4,9 @@ function point = searchNewton(funct, initial, epsilon)
     if (epsilon <= 0)
         error("epsilon must be greater than 0.");
     end
+    if (isinf(initial) || isnan(initial))
+        error('Infinite boundary found.')
+    end
     
     tangent = getTangent(funct);
     doubletangent = getDoubleTangent(funct);

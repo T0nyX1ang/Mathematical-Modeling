@@ -6,6 +6,9 @@ function point = searchTangent(funct, start, stop, epsilon)
     if (stop < start)
         error("stop must be greater than start.")
     end
+    if (isinf(start) || isinf(stop) || isnan(start) || isnan(stop))
+        error('Infinite boundary found.')
+    end
     
     tangent = getTangent(funct);
     while (abs(tangent{1}(stop)) >= epsilon)

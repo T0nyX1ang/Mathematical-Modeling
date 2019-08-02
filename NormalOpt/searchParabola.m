@@ -4,6 +4,9 @@ function point = searchParabola(funct, start, mid, stop, epsilon)
     if (epsilon <= 0)
         error("epsilon must be greater than 0.");
     end
+    if (isinf(start) || isinf(stop) || isnan(start) || isnan(stop))
+        error('Infinite boundary found.')
+    end
     
     startVal = funct(start);
     midVal = funct(mid);

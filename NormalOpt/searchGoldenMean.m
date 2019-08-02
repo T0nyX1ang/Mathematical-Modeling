@@ -7,6 +7,9 @@ function point = searchGoldenMean(funct, start, stop, epsilon)
     if (stop < start)
         error("stop must be greater than start.")
     end
+    if (isinf(start) || isinf(stop) || isnan(start) || isnan(stop))
+        error('Infinite boundary found.')
+    end
     
     GoldenMean = (sqrt(5) - 1) / 2;
     

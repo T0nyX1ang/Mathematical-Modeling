@@ -13,11 +13,16 @@ function [start, stop] = searchValidInterval(funct, initial, step)
     end
     
     mid = start;
-    while (funct(stop) < funct(mid))
+    while (funct(stop) < funct(mid)) && (abs(step) <= 1e10)
         start = mid;
         mid = stop;
         step = step * 2;
         stop = mid + step;
+    end
+    
+    if (abs(step) > 1e10) % handle monotone
+        start = -inf;
+        stop = +inf;
     end
     
     if (start > stop)

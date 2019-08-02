@@ -8,6 +8,9 @@ function point = searchInterp(funct, start, stop, epsilon)
     if (stop < start) || (tangent{1}(start) >= 0) || (tangent{1}(stop) <= 0)
         error("Invalid initial condition");
     end
+    if (isinf(start) || isinf(stop) || isnan(start) || isnan(stop))
+        error('Infinite boundary found.')
+    end
     
     while (abs(stop - start) >= epsilon)
         s = 3 * (funct(stop) - funct(start)) / (stop - start);
