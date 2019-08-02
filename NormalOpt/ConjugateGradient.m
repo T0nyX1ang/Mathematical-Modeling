@@ -14,7 +14,7 @@ function [xval, fval] = ConjugateGradient(funct, initial, epsilon, step)
     if (step < 0)
         error("step must be greater than 0");
     end
-    
+     
     dimension = size(initial, 2);
     xval = initial;
     tangent = getTangent(funct, dimension);
@@ -24,11 +24,11 @@ function [xval, fval] = ConjugateGradient(funct, initial, epsilon, step)
         yval = xval;
         tyval = tval;
         count = 0;
-        while (norm(tyval) >= epsilon) && (count < dimension)
+        lambda = +inf;
+        while (norm(tyval) >= epsilon) && (count < dimension) && (lambda > 0)
             % Define decrease function and search for a point
             dec_funct = @(lambda) funct(yval + lambda * tyval);
-            [start, stop] = searchValidInterval(dec_funct, 0, step);
-            lambda = searchGoldenMean(dec_funct, start, stop, epsilon);
+            lambda = UniversalSearch(dec_funct, 0, epsilon, step, 'goldenmean', 0, +inf);
             % Update yval here
             prev_yval = yval;
             yval = yval + lambda * tyval;
