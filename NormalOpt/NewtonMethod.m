@@ -1,4 +1,4 @@
-function [xval, fval] = NewtonDecrease(funct, initial, epsilon)
+function [xval, fval] = NewtonMethod(funct, initial, epsilon)
     % An implementation of newton decrease method.
     % epsilon: error value
     if (nargin == 2)
