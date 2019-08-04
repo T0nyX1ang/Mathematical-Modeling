@@ -1,42 +1,41 @@
-function [xval, fval] = Rosenbrock(funct, initial, dirMatrix, delta, alpha, beta, epsilon)
+function [xval, fval] = Rosenbrock(funct, initial, epsilon, dirMatrix, delta, alpha, beta)
     % An implementation of Rosenbrock method.
+    % epsilon: error value
     % dirMatrix: direction matrix of n-dimension line vectors
     % delta: initial step vector
     % alpha: step incremental factor
     % beta: step decremental factor
-    % epsilon: error value
     dimension = size(initial, 2);
-    
     if (nargin == 2)
+        epsilon = 1e-6;
         dirMatrix = eye(dimension);
         delta = ones(size(initial));
         alpha = 2;
         beta = -1 / 2;
-        epsilon = 1e-6;
     elseif (nargin == 3)
+        dirMatrix = eye(dimension);
         delta = ones(size(initial));
         alpha = 2;
-        beta = -1 / 2;
-        epsilon = 1e-6;        
+        beta = -1 / 2;       
     elseif (nargin == 4)
+        delta = ones(size(initial));
+        alpha = 2;
+        beta = -1 / 2;       
+    elseif (nargin == 5)
         alpha = 2;
         beta = -1 / 2;
-        epsilon = 1e-6;         
-    elseif (nargin == 5)
-        beta = -1 / 2;
-        epsilon = 1e-6;
     elseif (nargin == 6)
-        epsilon = 1e-6;
+        beta = -1 / 2;
     end
     if (norm(dirMatrix' * dirMatrix - eye(dimension)) ~= 0)
         error("Invalid direction matrix");
     elseif (norm(size(delta) - size(initial)) ~= 0)
         error("delta and initial don't agree");
-    elseif (alpha < 1)
+    elseif (alpha <= 1)
         error("alpha must be greater than 1");
     elseif (beta <= -1 || beta >= 0)
         error("beta must be between -1 and 0");
-    elseif (epsilon < 0)
+    elseif (epsilon <= 0)
         error("epsilon must be greater than 0");
     end
     
@@ -81,10 +80,14 @@ function [xval, fval] = Rosenbrock(funct, initial, dirMatrix, delta, alpha, beta
                 else
                     dirMatrix(i, :) = new_dir(i, :);
                     for j = 1:i - 1
-                        dirMatrix(i, :) = dirMatrix(i, :) - (dirMatrix(j, :) * new_dir(i, :)') / (dirMatrix(j, :) * dirMatrix(j, :)') * dirMatrix(i, :);
+                        dirMatrix(i, :) = new_dir(i, :) - (dirMatrix(j, :) * new_dir(i, :)') / (dirMatrix(j, :) * dirMatrix(j, :)') * dirMatrix(j, :);
                     end
                 end
             end
+            for i = 1:dimension
+                dirMatrix(i, :) = dirMatrix(i, :) / norm(dirMatrix(i, :));
+            end
+            
             delta = initial_step;
         end
     end
