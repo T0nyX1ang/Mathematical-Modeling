@@ -10,3 +10,4 @@
 *.xdv
 *.pygtex
 *.pygstyle
+docs/*.pdf
