@@ -1,0 +1,1662 @@
+%!TeX Options=--shell-escape
+\documentclass{article}
+
+\usepackage{amsmath, amssymb, hyperref, xcolor, minted, enumitem}
+
+\hypersetup{%
+    pdfstartview=FitH,
+    bookmarksnumbered=true,
+    bookmarksopen=true, 
+    pdfborder=001,
+    allcolors=blue,
+    breaklinks=true
+}%
+
+\title{An Introduction to NormalOpt Collection \\ Version 1.0.0}
+\author{Tony Xiang}
+
+\begin{document}
+\maketitle
+\tableofcontents
+
+\newpage
+
+\section{Overall Introduction}
+This collection is written inspired by Chen Baolin's \textit{Optimization Theory and Algorithms} and the optimization course in Wuhan University. As those algorithms are really fanscinating, we decide to implement them by myself. Before you use these MATLAB codes, you should be aware that MATLAB has its own Optimization Toolbox and it's very useful in most circumstances. Our work is not based on the toolbox, but based on MATLAB itself and another toolbox named Symbolic Math Toolbox to get the symbolic derivatives of functions as an input.
+
+This is a collection of many useful algorithms. The names of each file show exactly what they mean. Files started with lowerbound letters are utilities which don't need be executed individually at most time. Files started with upperbound/capital letters are implemented algorithms which should be executed individually for use.
+
+The whole collection is licensed under GNU General Public License Version 2.0. You can choose this license or any later version if you want to use our codes in your project. The full license will be posted at the end of this introduction.
+
+\section{Utilities}
+\textcolor{blue}{Keep in mind: Utilities don't need to be executed individually at most time.}
+
+\subsection{Swap Function}
+\begin{minted}[breaklines, breakanywhere]{matlab}
+function [c, d] = swap(a, b)
+\end{minted}
+
+Swap two numbers. If $a, b$ are inputs, $b, a$ will be outputs. We use additional $c, d$ for this substitution, so the original $a, b$ is \textcolor{blue}{unchanged}.
+
+\subsection{Derivative Functions}
+\subsubsection{Get Derivative Function}
+\begin{minted}[breaklines, breakanywhere]{matlab}
+function tanFunct = getTangent(funct, dimension)
+\end{minted}
+
+\paragraph{Introduction}
+Get the derivative function of a given function. Derivative is calculated per variable(partially). \textcolor{blue}{funct} is a \textbf{function handle} in MATLAB. \textcolor{blue}{funct} should be created as a vector, like this:
+\begin{minted}[breaklines, breakanywhere]{matlab}
+funct = @(x) x(1).^2 + 1./x(2) + x(3)   
+\end{minted}
+
+And \textcolor{blue}{dimension} is the variables in your function. For example, the function created above has $3$ dimensions. The output will be a $1 \times n$ cell which n is according to \textcolor{blue}{dimension}. The output shows the devirative of each variable using anonymous functions in the cell.
+
+\paragraph{Algorithm}
+The algorithm is quite simple here. We use Symbolic Math Toolbox in MATLAB to help out. 
+\begin{enumerate}
+    \item Convert input function to a symbolic function.
+    \item Change variable style for convenience.
+    \item Get derivatives by the toolbox.
+    \item Convert the result to anonymous function, and put it in the cell.
+\end{enumerate}
+
+\paragraph{\textcolor{red}{Warnings}}
+\begin{enumerate}
+    \item \textcolor{blue}{funct} should have devirative at least.
+    \item \textcolor{blue}{funct} and \textcolor{blue}{dimension} must match.
+    \item \textcolor{blue}{dimension} will be $1$ if not assigned.
+\end{enumerate}
+
+\subsubsection{Get Second Order Derivative Function}
+\begin{minted}[breaklines, breakanywhere]{matlab}
+function tanFunct = getDoubleTangent(funct, dimension)
+\end{minted}
+
+\paragraph{Introduction}
+This function is based on Get Derivative Function. The inputs are the same as what's mentioned in Get Derivative Function. The difference is that the function calculates second order derivatives of a given function, and the output is a $n \times n$ cell, which $n$ denotes to the \textcolor{blue}{dimension}. The formats are the same as Get Derivative Function.
+
+\subsubsection{Get Derivative Value Function}
+\begin{minted}[breaklines, breakanywhere]{matlab}
+function tval = getTangentValue(tanFunct, point)
+\end{minted}
+
+\paragraph{Introduction}
+This function should \textbf{receive devirative outputs} from Get Derivative Function or Get Second Order Derivative Function. It will calculate the value based on the \textcolor{blue}{point} assigned to the function and return a \textbf{matrix} output which is the same size as input. By executing it, the format will be convenient to use.
+
+\subsection{Search Functions}
+In this part, we are going to talk about one dimensional search on functions. The general aim is to solve:
+\begin{equation*}
+    \mbox{minimize } f(x), x \in \mathbb{R}^1 \mbox{ or bounded.}
+\end{equation*}
+
+\subsubsection{Golden Mean Method}
+\begin{minted}[breaklines, breakanywhere]{matlab}
+function point = searchGoldenMean(funct, start, stop, epsilon)
+\end{minted}
+
+\paragraph{Introduction}
+Find the point which reaches the minimum value in a function. \textcolor{blue}{funct} is a \textbf{function handle} in MATLAB, an anonymous function will be the best choice. A single function script is OK. \textcolor{blue}{start and stop} is the search interval you want to use. \textcolor{blue}{epsilon} is the limit to stop the iteration.
+
+\paragraph{Algorithm} 
+The algorithm is implemented below, \textcolor{blue}{funct} is denoted as $f$, \textcolor{blue}{start} is denoted as $b$, \textcolor{blue}{end} is denoted as $e$, \textcolor{blue}{epsilon} is denoted as $\varepsilon$:
+\begin{enumerate}
+    \item set the GoldenMean value: $g = (\sqrt{5} - 1) / 2$. It's stored as a double.
+    \item set $\lambda = b + (1 - g)(e - b)$, and $\lambda = b + g(e - b)$.
+    \item If $e - b \geqslant \varepsilon$, go to Step 4, else go to Step 7.
+    \item If $f(\lambda) > f(\mu)$, go to Step 5, else go to Step 6.
+    \item Let $b = \lambda, \lambda = \mu, \mu = b + g(e - b)$, and go to Step 4.
+    \item Let $e = \mu, \mu = \lambda, \lambda = b + (1 - g)(e - b)$, and go to Step 4.
+    \item Return $(b + g) / 2$ as output.
+\end{enumerate}
+
+\paragraph{\textcolor{red}{Warnings}}
+\begin{enumerate}
+    \item \textcolor{blue}{epsilon} must be greater than $0$. 
+    \item \textcolor{blue}{end} must be greater than \textcolor{blue}{start}.
+    \item \textcolor{blue}{funct} must have only one minimum. The program will misbehave when there are multiple minimums.
+\end{enumerate}
+
+\paragraph{An example (not needed mostly)}
+Suppose we want to get the minimum of $f(x) = x^4 - 6x^2 + 2x + 1, x in [0.5, 3]$ with error $\varepsilon = 10^{-6}$. We can use the function like this:
+\begin{minted}[breaklines, breakanywhere]{matlab}
+point = searchGoldenMean(@(x) x.^4 - 6*x.^2 + 2*x + 1, 0.5, 3, 1e-6)
+\end{minted}
+
+And the result is $1.6418$ which is the right answer.
+
+\subsubsection{Tangent Method}
+\begin{minted}[breaklines, breakanywhere]{matlab}
+function point = searchTangent(funct, start, stop, epsilon)
+\end{minted}
+
+\paragraph{Introduction}
+Find the point which reaches the minimum value in a function. \textcolor{blue}{funct, epsilon} is the same as what's mentioned in Golden Mean Method. \textcolor{blue}{start, stop} is your initial guess interval which the optimal point might be into. This function is based on Get Derivative Function.
+
+\paragraph{Algorithm}
+The algorithm is implemented below, the denotions are the same as what's mentioned in Golden Mean Method:
+\begin{enumerate}
+    \item Get the derivative of \textcolor{blue}{funct} at $e$, let it be $f'(e)$.
+    \item If $|f'(e)| \geqslant \varepsilon$, go to Step 3, else go to Step 4.
+    \item Let $t$ is a temporary variable. Let $t = e, e = e - \frac{e - b}{f'(e) - f'(b)} f'(e), b = t$, go to Step 2.
+    \item Return $e$ as output.
+\end{enumerate}
+
+\paragraph{\textcolor{red}{Warnings}}
+\begin{enumerate}
+    \item \textcolor{blue}{epsilon} must be greater than $0$. 
+    \item \textcolor{blue}{end} must be greater than \textcolor{blue}{start}.
+    \item If \textcolor{blue}{funct} have more than one minimum, this function might not find the optimal value.
+    \item The output might be outside the given \textcolor{blue}{start} and \textcolor{blue}{stop} interval. Narrower intervals will reach higher precision.
+\end{enumerate}
+
+\paragraph{An example (not needed mostly)}
+Suppose we want to get the minimum of $f(x) = x^4 - 6x^2 + 2x + 1$, initial interval is $[0.5, 3]$ with error $\varepsilon = 10^{-6}$. We can use the function like this:
+\begin{minted}[breaklines, breakanywhere]{matlab}
+point = searchTangent(@(x) x.^4 - 6*x.^2 + 2*x + 1, 0.5, 3, 1e-6)
+\end{minted}
+
+And the result is $0.1683$ which isn't the right answer.
+
+But if we narrow the interval to $[2, 3]$, the result comes back to $1.6418$.
+
+\subsubsection{Newton Method}
+\begin{minted}[breaklines, breakanywhere]{matlab}
+function point = searchNewton(funct, initial, epsilon)
+\end{minted}
+
+\paragraph{Introduction}
+Find the point which reaches the minimum value in a function. \textcolor{blue}{funct, epsilon} is the same as what's mentioned in Golden Mean Method. \textcolor{blue}{initial} is the initial value in the iteration. This function is based on Get Double Function Method.
+
+\paragraph{Algorithm}
+The algorithm is implemented below, \textcolor{blue}{funct} is denoted as $f$, \textcolor{blue}{initial} is denoted as $x$, \textcolor{blue}{epsilon} is denoted as $\varepsilon$:
+\begin{enumerate}
+    \item Get the derivative and the second derivative of \textcolor{blue}{funct} at $x$, let it be $f'(x)$ and $f''(x)$.
+    \item If $|f'(x)| \geqslant \varepsilon$, go to Step 3, else go to Step 4.
+    \item Update initial $x = x - \frac{f'(x)}{f''(x)}$, go to Step 2.
+    \item Return $x$ as output.
+\end{enumerate}
+
+\paragraph{\textcolor{red}{Warnings}}
+\begin{enumerate}
+    \item \textcolor{blue}{epsilon} must be greater than $0$. 
+    \item Warnings will be given when the second order of \textcolor{blue}{funct} is less than \textcolor{blue}{epsilon}. This is an ill conditioned function.
+    \item If \textcolor{blue}{funct} have more than one minimum, this function might not find the optimal value.
+    \item This method is \textbf{very} sensitive to \textcolor{blue}{initial} point. And \textcolor{blue}{funct} need to be $C^2$.
+\end{enumerate}
+
+\paragraph{An example (not needed mostly)}
+Suppose we want to get the minimum of $f(x) = x^4 - 6x^2 + 2x + 1$, initial point is $0.5$ with error $\varepsilon = 10^{-6}$. We can use the function like this:
+\begin{minted}[breaklines, breakanywhere]{matlab}
+point = searchNewton(@(x) x.^4 - 6*x.^2 + 2*x + 1, 0.5, 1e-6)
+\end{minted}
+
+And the result is $0.1683$ which isn't the right answer.
+
+But if we set the initial point to $2$, the result comes back to $1.6418$.
+
+\subsubsection{Parabola Method}
+\begin{minted}[breaklines, breakanywhere]{matlab}
+function point = searchParabola(funct, start, mid, stop, epsilon)
+\end{minted}
+
+\paragraph{Introduction}
+Find the point which reaches the minimum value in a function. \textcolor{blue}{funct, epsilon} is the same as what's mentioned in Golden Mean Method. \textcolor{blue}{start, mid, stop} is the initial guess to start the iteration. This function uses swap function.
+
+\paragraph{Algorithm}
+The algorithm is implemented below, \textcolor{blue}{funct} is denoted as $f$, \textcolor{blue}{start} is denoted as $b$, \textcolor{blue}{mid} is denoted as $m$, \textcolor{blue}{stop} is denoted as $e$, \textcolor{blue}{epsilon} is denoted as $\varepsilon$:
+\begin{enumerate}
+    \item Calculate values at $b, m, e$, and let them $f(b), f(m), f(e)$. Let $v = \min\{f(b)$, $f(m)$, $f(e)\}$.
+    \item If $v = f(b)$, swap $b, m$, else if $v = f(e)$, swap $e, m$. Set a decrease variable $d = +\infty$.
+    \item If $d \geqslant 0$, go to Step 4, else go to Step 6.
+    \item Recalculate $f(b), f(m), f(e)$, and construct a parabola $P$ by $(b, f(b))$, $(m, f(m))$, $(e, f(e))$. Get the minimum of $P$ at $(x^*, f(x^*))$. Update decrease variable $d = \min{\{f(b), f(m), f(e)\}} - f(x^*)$.
+    \item Add point $x^*$ into $\{b, m, e\}$, and remove the point which reaches highest value. Plus, raise an error if $m$ is removed. Go to Step 3.
+    \item Return $x^*$ as output.
+\end{enumerate}
+
+\paragraph{\textcolor{red}{Warnings}}
+\begin{enumerate}
+    \item \textcolor{blue}{epsilon} must be greater than $0$. 
+    \item The \textcolor{blue}{funct} $f$ and \textcolor{blue}{start, mid, stop} $b, m, e$ \textbf{must satisfy} $f(b) > f(m)$ and $f(e) > f(m)$.
+    \item If \textcolor{blue}{funct} have more than one minimum, this function might not find the optimal value.
+    \item Narrower intervals will reach higher precision.
+\end{enumerate}
+
+\paragraph{An example (not needed mostly)}
+Suppose we want to get the minimum of $f(x) = x^4 - 6x^2 + 2x + 1$, initial guess is $0.5, 2, 3$ with error $\varepsilon = 10^{-6}$. We can use the function like this:
+\begin{minted}[breaklines, breakanywhere]{matlab}
+point = searchParabola(@(x) x.^4 - 6*x.^2 + 2*x + 1, 0.5, 2, 3, 1e-6)
+\end{minted}
+
+And the result is $1.6415$ which is near the right answer.
+
+\subsubsection{Cubic Interpolation Method}
+\begin{minted}[breaklines, breakanywhere]{matlab}
+function point = searchInterp(funct, start, stop, epsilon)
+\end{minted}
+
+\paragraph{Introduction}
+Find the point which reaches the minimum value in a function. \textcolor{blue}{funct, epsilon} is the same as what's mentioned in Golden Mean Method. \textcolor{blue}{start, stop} is the initial interval to start the iteration. This function is based on the Get Derivative Function.
+
+\paragraph{Algorithm}
+The algorithm is implemented below, \textcolor{blue}{funct} is denoted as $f$, the derivative of $f$ is denoted as $f'$, \textcolor{blue}{start} is denoted as $b$, \textcolor{blue}{stop} is denoted as $e$, \textcolor{blue}{epsilon} is denoted as $\varepsilon$:
+\begin{enumerate}
+    \item If $|e - b| \geqslant 0$, go to Step 2, else go to Step 4.
+    \item Let $s = 3 \frac{f(e) - f(b)}{e - b}$, $z = s - f'(e) - f'(b)$, $w = \sqrt{z^2 - f'(b) f'(e)}$. Let $x^* = b + (e - b)(1 - \frac{f'(e) + w + z}{f'(e) - f'(b) + 2w})$.
+    \item If $f'(x^*) < 0$, $b = x^*$, else if $f'(x^*) > 0$, $e = x^*$, else go to Step 4.
+    \item Return $x^*$ as output.
+\end{enumerate}
+
+\paragraph{\textcolor{red}{Warnings}}
+\begin{enumerate}
+    \item \textcolor{blue}{epsilon} must be greater than $0$. 
+    \item \textcolor{blue}{end} must be greater than \textcolor{blue}{start}.
+    \item The \textcolor{blue}{funct} $f$ and initial guess $b, e$ must satisfy $f'(b) < 0$ and $f'(e) > 0$.
+    \item If \textcolor{blue}{funct} have more than one minimum, this function might not find the optimal value.
+\end{enumerate}
+
+\paragraph{An example (not needed mostly)}
+Suppose we want to get the minimum of $f(x) = x^4 - 6x^2 + 2x + 1, x \in [0.5, 3]$ with error $\varepsilon = 10^{-6}$. We can use the function like this:
+\begin{minted}[breaklines, breakanywhere]{matlab}
+point = searchInterp(@(x) x.^4 - 6*x.^2 + 2*x + 1, 0.5, 3, 1e-6)
+\end{minted}
+
+And the result is $1.6418$ which is the right answer. Actually this method is very stable.
+
+\subsubsection{Search a Valid Interval}
+\begin{minted}[breaklines, breakanywhere]{matlab}
+function [start, stop] = searchValidInterval(funct, initial, step)
+\end{minted}
+
+\paragraph{Introduction}
+Unlike the various searching methods above, this function is made to search for a valid interval to apply the methods on. \textcolor{blue}{funct} is the function you want to search for a valid interval. \textcolor{blue}{initial} is the initial guess to start the iteration. \textcolor{blue}{step} is the initial step for a search, and it's adaptive to the input \textcolor{blue}{funct}. This function has two outputs, \textcolor{blue}{start} and \textcolor{blue}{stop} which stores the interval for further use. This function uses swap function.
+
+\paragraph{Algorithm}
+The algorithm is implemented below, \textcolor{blue}{funct} is denoted as $f$, \textcolor{blue}{initial} is denoted as $x$, \textcolor{blue}{start} is denoted as $b$, \textcolor{blue}{stop} is denoted as $e$ (Apparently, $e = b + x$), \textcolor{blue}{step} is denoted as $l$:
+\begin{enumerate}
+    \item If $f(e) \geqslant f(b)$, $l = -l$, and swap $b, e$. And Set a temporary variable $m = s$.
+    \item If $f(e) < f(b)$, go to Step 3, else go to Step 4.
+    \item Let $b = m, m = e, l = 2l, e = m + l$, go to Step 2.
+    \item If $b > e$, swap $b, e$. Return $b, e$ as output.
+\end{enumerate}
+
+\paragraph{\textcolor{red}{Warnings}}
+\begin{enumerate}
+    \item \textcolor{blue}{step} can't be $0$.
+    \item The output of this function is based on $f, l$. Smaller $l$ will reach higher precision, but it's time-consuming.
+    \item This search method is often applied on $\mathbb{R}^1$.
+    \item This function will misbehave when \textcolor{blue}{funct} is monotone. To handle this, if $l > 10^{10}$, we decide to return $[-\infty, \infty]$, and throw an \textcolor{red}{error} message in search programs afterwards if no boundary conditions are set.
+\end{enumerate}
+
+\paragraph{Example}
+Suppose we want to get a valid interval of $f(x) = x^4 - 6x^2 + 2x + 1, x \in \mathbb{R}^1$ with an initial point $x = 0$ and an initial step $l = 10^{-3}$. We can use the function like this:
+\begin{minted}[breaklines, breakanywhere]{matlab}
+[start, stop] = searchValidInterval(@(x) x.^4 - 6*x.^2 + 2*x + 1, 0, 1e-3)
+\end{minted}
+
+We get $[-4.0940, -1.0220]$ as a result. If you use the methods mentioned above, you will get $x = -1.8100$ which $f(x)$ will be smaller than the search on $[0.5, 3]$. So this function often searches broader area if the input \textcolor{blue}{funct} is good enough.
+
+\subsubsection{Universal Search}
+\begin{minted}[breaklines, breakanywhere]{matlab}
+function point = UniversalSearch(funct, initial, epsilon, step, [method], [lb], [ub])
+\end{minted}
+
+\paragraph{Introduction}
+This function works as a wrapper which can call all of the searching methods and find a valid interval automatically. \textcolor{blue}{funct, initial, epsilon, step} is the same as what's mentioned before. And we are going to take a look at three optional arguments: \textcolor{blue}{method, lb} and \textcolor{blue}{ub}. \textbf{Optional arguments will be wrapped with brankets for difference.}
+
+\textcolor{blue}{method} is the searching method you want to use. Available methods are: 'goldenmean'(default method), 'tangent', 'newton', 'parabola' and 'interp'. They match Golden Mean Method, Tangent Method, Newton Method, Parabola Method and Cubic Interpolation Method in order. \textcolor{blue}{lb} is the lowerbound of $x$, and \textcolor{blue}{ub} is the upperbound of $x$. In a word, \textcolor{blue}{lb} $\leqslant x \leqslant$ \textcolor{blue}{ub}.
+
+\paragraph{\textcolor{red}{Warnings}}
+\begin{enumerate}
+    \item \textcolor{blue}{lb} and \textcolor{blue}{ub} is \textbf{only} compatible with 'goldenmean' method.
+    \item 'newton' and 'parabola' method might be incompatible with this wrapper as the principle inside the algorithms is unlike that in 'goldenmean', 'parabola' and 'interp'.
+    \item 'parabola' method might be instable because three valid points are needed.
+\end{enumerate}
+
+This function can be used individually for some one dimensional functions, but it has more use in further sections. As examples are mentioned individually before, there are no examples here.
+
+\subsection{Barrier Functions}
+\textcolor{blue}{You don't need to execute functions in this section at all.}
+
+\subsubsection{Get Outer Barrier Function}
+\begin{minted}[breaklines, breakanywhere]{matlab}
+function outerBarrierFunct = getOuterBarrier(constraint, equality, dimension)
+\end{minted}
+\paragraph{Introduction}
+Find the outer barrier function in a cell of inequalities and equalities. \textcolor{blue}{constraint} is a cell of inequalities, \textcolor{blue}{equality} is a cell of equalities, \textcolor{blue}{dimension} is the dimension of \textcolor{blue}{initial} which doesn't appear here explicitly.
+
+\paragraph{Algorithm}
+The algorithm is implemented below, a detailed introduction is in the Constrained Optimization section, Outer Barrier Method part.
+\begin{enumerate}
+    \item Convert input function to a symbolic function.
+    \item Change variable style for convenience.
+    \item Get outer barrier functions by the toolbox.
+    \item Convert the result to anonymous function, and put it in the cell.
+\end{enumerate}
+
+\subsubsection{Get Inner Barrier Function}
+\begin{minted}[breaklines, breakanywhere]{matlab}
+function innerBarrierFunct = getInnerBarrier(constraint, dimension, [type])
+\end{minted}
+\paragraph{Introduction}
+Find the inner barrier function in a cell of inequalities. \textcolor{blue}{constraint} is a cell of inequalities, \textcolor{blue}{dimension} is the dimension of \textcolor{blue}{initial} which doesn't appear here explicitly, \textcolor{blue}{type} is the type to create an inner barrier function. Type $1$ is reciprocal style, and type $2$ is logarithm style.
+
+\paragraph{Algorithm}
+The algorithm is implemented below, a detailed introduction is in the Constrained Optimization section, Inner Barrier Method part.
+\begin{enumerate}
+    \item Convert input function to a symbolic function.
+    \item Change variable style for convenience.
+    \item Get inner barrier functions by the toolbox.
+    \item Convert the result to anonymous function, and put it in the cell.
+\end{enumerate}
+
+\section{Linear Programming}
+\subsection{Simplex Method}
+In the following parts, we are going to talk about Simplex Method. We divide this method into two parts. Simplex Core is used to solve the following LP problem:
+\begin{align*}
+    \mbox{minimize } & f = \mathbf{c}\mathbf{x} \\
+    \mbox{s.t. } & A\mathbf{x} = \mathbf{b} \\
+                 & \mathbf{x} \geqslant 0 \\
+                 & \mathbf{b} \geqslant 0
+\end{align*}
+
+And the general Simplex Solver is used to solve the following LP problem:
+\begin{align*}
+    \mbox{minimize } & f = \mathbf{c}\mathbf{x} \\
+    \mbox{s.t. } & A\mathbf{x} \leqslant \mathbf{b} \\
+                 & A_{\mbox{eq}} \mathbf{x} = \mathbf{b}_{\mbox{eq}} \\
+                 & \mbox{lb} \leqslant \mathbf{x} \leqslant \mbox{ub}
+\end{align*}
+
+Simplex Core is a special condition of Simplex Solver.
+
+\subsubsection{Simplex Core}
+\begin{minted}[breaklines, breakanywhere]{matlab}
+function [xval, fval] = SimplexMethod(c, A, b, [epsilon])    
+\end{minted}
+\paragraph{Introduction}
+In the program, \textcolor{blue}{c} is $\mathbf{c}$, \textcolor{blue}{A} is $A$, and \textcolor{blue}{b} is $\mathbf{b}$ in the former LP problem. And \textcolor{blue}{epsilon} is used to control the limit to find a starting point.
+
+\paragraph{Algorithm}
+This algorithm is not easy to describe here. We are only giving a brief introduction.
+\begin{enumerate}
+    \item Find out a valid solution using a table.
+    \item If no solutions are found, print an error message, else find out a optimal solution.
+\end{enumerate}
+
+\paragraph{\textcolor{red}{Warnings}}
+\begin{enumerate}
+    \item Please make sure all of your inputs have the right size/dimension.
+    \item \textcolor{red}{[Bug Warning]} This program can't cover all of the LP problems.
+    \item The table is manipulated by row transformation and pivoting in every iteration.
+\end{enumerate}
+
+\subsubsection{Simplex Solver}
+\begin{minted}[breaklines, breakanywhere]{matlab}
+function [xval, fval] = SimplexSolver(c, A, b, [Aeq], [beq], [lb], [ub], [epsilon])    
+\end{minted}
+In the program, \textcolor{blue}{c} is $\mathbf{c}$, \textcolor{blue}{A} is $A$, and \textcolor{blue}{b} is $\mathbf{b}$, \textcolor{blue}{Aeq} is $A_{\mbox{eq}}$, \textcolor{blue}{beq} is $\mathbf{b}_{\mbox{eq}}$, in the former LP problem (lb and ub is unchanged by the way). And \textcolor{blue}{epsilon} is used to control the limit to find a starting point.
+
+\paragraph{Algorithm}
+This algorithm is not easy to describe here. We are only giving a brief introduction.
+\begin{enumerate}
+    \item Convert the LP in Simplex Solver to Simplex Method by adding some additional variables. 
+    \item Find out a valid solution using a table.
+    \item If no solutions are found, print an error message, else find out a optimal solution.
+    \item The table is manipulated by row transformation and pivoting in every iteration.    
+\end{enumerate}
+
+\paragraph{\textcolor{red}{Warnings}}
+\begin{enumerate}
+    \item Please make sure all of your inputs have the right size/dimension.
+    \item \textcolor{red}{[Bug Warning]} This program can't cover all of the LP problems.
+\end{enumerate}
+
+\paragraph{Example}
+Suppose we are going to solve the following LP:
+\begin{align*}
+    \mbox{minimize } &  -x_1 - 8x_2 - 5x_3 - 6x_4 \\
+    \mbox{s.t. } & x_1 + 4x_2 + 5x_3 + 2x_4 \leqslant 7 \\
+                 & 2x_1 + 3x_2 \leqslant 6 \\
+                 & 5x_1 + x_2 \leqslant 5 \\
+                 & 3x_3 + 4x_4 \geqslant 12 \\
+                 & x_3 \leqslant 4 \\
+                 & x_4 \leqslant 3 \\
+                 & x_j \geqslant 0, \quad j = 1, \cdots 4
+\end{align*}
+
+We can use the function like this:
+\begin{minted}[breaklines, breakanywhere]{matlab}
+[xval, fval] = SimplexSolver([-1 -8 -5 -6], [1 4 5 2; 2 3 0 0; 5 1 0 0; 0 0 -3 -4], [7 6 5 -12]', [], [], [0 0 0 0]', [+inf, +inf, 4, 3]')
+\end{minted}
+
+And the function returns xval $=[0, 0.2500, 0.0000, 3.0000]^T$ and fval$=-20.0000$ as a result, which is the right answer.
+
+\section{Unconstrained Optimization}
+\textcolor{blue}{Keep in mind: It's important to focus on \textbf{step} and \textbf{direction} here.}
+
+In this section, we are going to talk about higher dimensional optimization on unconstrained functions. The general aim is to solve:
+\begin{equation*}
+    \mbox{minimize } f(\mathbf{x}), x \in \mathbb{R}^n.
+\end{equation*}
+
+\subsection{Based on Derivatives}
+\subsubsection{Fastest Descent Method}
+\begin{minted}[breaklines, breakanywhere]{matlab}
+function [xval, fval] = FastestDescent(funct, initial, [epsilon], [step])
+\end{minted}
+
+\paragraph{Introduction}
+Find the vector which reaches the minimum value in a function. \textcolor{blue}{funct, initial, epsilon, step} is the same as what's mentioned in the Search Functions part. This function has two outputs: \textcolor{blue}{xval} stands for a vector to reach the minimum value, and \textcolor{blue}{fval} stands for the minimum value. This function uses Golden Mean Method to search for the search step, and uses Get Derivative Function to search for direction.
+
+\paragraph{Algorithm}
+The algorithm is implemented below, \textcolor{blue}{funct} is denoted as $f$, the gradient of $f$ is denoted as $\nabla f$, \textcolor{blue}{initial} is denoted as $\mathbf{x}$, \textcolor{blue}{step} is denoted as $l$, \textcolor{blue}{epsilon} is denoted as $\varepsilon$:
+\begin{enumerate}
+    \item If $||\nabla f(\mathbf{x})|| \geqslant \varepsilon$, go to Step 2, else go to Step 4.
+    \item Let searching direction $\mathbf{d} = -\nabla f(\mathbf{x})$, and searching the point $\lambda$ which minimizes $f(\mathbf{x} + \lambda \mathbf{d})$.
+    \item Update value $\mathbf{x} = \mathbf{x} + \lambda \mathbf{d}$ using $\lambda, \mathbf{d}$ from Step 2, and go to Step 1.
+    \item Return $\mathbf{x}, f(\mathbf{x})$ as outputs.
+\end{enumerate}
+
+\paragraph{\textcolor{red}{Warnings}}
+\begin{enumerate}
+    \item \textcolor{blue}{step} must be greater than $0$. Its default value is $10^{-3}$.
+    \item \textcolor{blue}{epsilon} must be greater than $0$. Its default value is $10^{-6}$.
+    \item Some functions are unable to be optimized. If you meet an error says 'Infinite boundary found'. It's likely that the function doesn't have a minimum (which means it minimum is $-\infty$).
+    \item Try to make $\varepsilon$ larger if it takes a long time to calculate (or run into a dead loop). If search step $\lambda$ reaches $0$, we will forcibly terminate the iteration.
+\end{enumerate}
+
+\paragraph{Example}
+Suppose we want to get the minimum of $f(x_1, x_2) = 2 x_1^2 + 3 x_2^2 - 4 x_1 x_2 + 6 x_1 - 9 x_2 + 2$ using default settings with an initial point $[-1, 0]$. We can use the function like this:
+\begin{minted}[breaklines, breakanywhere]{matlab}
+[xval, fval] = FastestDescent(@(x) 2 * x(1)^2 + 3 * x(2)^2 -4 * x(1) * x(2) + 6 * x(1) - 9 * x(2) + 2, [-1, 0])
+\end{minted}
+
+And the function returns $\mathbf{x} = [-0.0000, 1.5000], f(\mathbf{x}) = -4.7500$ as a result which is the right answer.
+
+\subsubsection{Conjugate Gradient Method}
+\begin{minted}[breaklines, breakanywhere]{matlab}
+function [xval, fval] = ConjugateGradient(funct, initial, [epsilon], [step])
+\end{minted}
+
+\paragraph{Introduction}
+Find the vector which reaches the minimum value in a function. The inputs and outputs are consistent with that in Fastest Descent. The direction is based on conjugate vectors.
+
+\paragraph{Algorithm}
+The algorithm is implemented below, \textcolor{blue}{funct} is denoted as $f$, the gradient of $f$ is denoted as $\nabla f$, \textcolor{blue}{initial} is denoted as $\mathbf{x}$, \textcolor{blue}{step} is denoted as $l$, \textcolor{blue}{epsilon} is denoted as $\varepsilon$:
+\begin{enumerate}
+    \item If $||\nabla f(\mathbf{x})|| \geqslant \varepsilon$, go to Step 2, else go to Step 6.
+    \item Let an addition variable $\mathbf{y} = \mathbf{x}$ and calculate the gradient $\mathbf{d} = -\nabla f(\mathbf{y})$. Add a counting variable $c = 0$.
+    \item If $||\nabla f(\mathbf{y})|| \geqslant \varepsilon$ and $c$ is smaller than the dimension of the function, go to Step 4, else go to Step 1.
+    \item Search the point $\lambda$ which minimizes $f(\mathbf{y} + \lambda \mathbf{d})$.
+    \item Update value $\mathbf{y'} = \mathbf{y} + \lambda \mathbf{d}$, $\beta = \frac{||\nabla f(\mathbf{y'})||^2}{||\nabla f(\mathbf{y})||^2}$, $\mathbf{d} = -\nabla f(\mathbf{y}) + \beta \mathbf{d}$. Break this iteration if $ \mathbf{d}\nabla f(\mathbf{d}) \geqslant 0$, else $c = c + 1, \mathbf{y} = \mathbf{y'}$ and go to Step 3.
+    \item Return $\mathbf{x}, f(\mathbf{x})$ as outputs.
+\end{enumerate}
+
+\paragraph{\textcolor{red}{Warnings}}
+\begin{enumerate}
+    \item \textcolor{blue}{step} must be greater than $0$. Its default value is $10^{-3}$.
+    \item \textcolor{blue}{epsilon} must be greater than $0$. Its default value is $10^{-6}$.
+    \item Some functions are unable to be optimized. If you meet an error says 'Infinite boundary found'. It's likely that the function doesn't have a minimum (which means it minimum is $-\infty$).
+    \item Try to make $\varepsilon$ larger if it takes a long time to calculate (or run into a dead loop). If search step $\lambda$ reaches $0$, we will forcibly terminate the iteration.
+\end{enumerate}
+
+\paragraph{Example}
+Suppose we want to get the minimum of $f(x_1, x_2) = 2 x_1^2 + 3 x_2^2 - 4 x_1 x_2 + 6 x_1 - 9 x_2 + 2$ using default settings with an initial point $[-1, 0]$. We can use the function like this:
+\begin{minted}[breaklines, breakanywhere]{matlab}
+[xval, fval] = ConjugateGradient(@(x) 2 * x(1)^2 + 3 * x(2)^2 -4 * x(1) * x(2) + 6 * x(1) - 9 * x(2) + 2, [-1, 0])
+\end{minted}
+
+And the function returns $\mathbf{x} = [-0.0000, 1.5000], f(\mathbf{x}) = -4.7500$ as a result which is the right answer.
+
+\subsubsection{Newton Method}
+\begin{minted}[breaklines, breakanywhere]{matlab}
+function [xval, fval] = NewtonMethod(funct, initial, [epsilon])
+\end{minted}
+
+\paragraph{Introduction}
+Find the vector which reaches the minimum value in a function. \textcolor{blue}{funct, initial, epsilon} is the same as what's mentioned in the Search Function part. You don't need an initial step in this function. Newton method is an extension of the former search method.
+
+\paragraph{Algorithm}
+The algorithm is implemented below, \textcolor{blue}{funct} is denoted as $f$, the gradient of $f$ is denoted as $\nabla f$, the second order gradient of $f$ is denoted as $\nabla^2 f$, \textcolor{blue}{initial} is denoted as $\mathbf{x}$, \textcolor{blue}{epsilon} is denoted as $\varepsilon$:
+\begin{enumerate}
+    \item If $||\nabla f(\mathbf{x})|| \geqslant \varepsilon$, go to Step 2, else go to Step 3.
+    \item $\mathbf{x} = \mathbf{x} - \nabla f(\mathbf{x}) (\nabla^2 f(\mathbf{x}))^{-1}$, go to Step 1.
+    \item Return $\mathbf{x}, f(\mathbf{x})$ as outputs.
+\end{enumerate}
+
+\paragraph{\textcolor{red}{Warnings}}
+\begin{enumerate}
+    \item This method is instable as the Hessian Matrix $\nabla^2 f(x)$ is very likely to be singular.
+    \item \textcolor{blue}{epsilon} must be greater than $0$. Its default value is $10^{-6}$.
+\end{enumerate}
+
+\paragraph{Example}
+Suppose we want to get the minimum of $f(x_1, x_2) = 2 x_1^2 + 3 x_2^2 - 4 x_1 x_2 + 6 x_1 - 9 x_2 + 2$ using default settings with an initial point $[-1, 0]$. We can use the function like this:
+\begin{minted}[breaklines, breakanywhere]{matlab}
+[xval, fval] = NewtonMethod(@(x) 2 * x(1)^2 + 3 * x(2)^2 -4 * x(1) * x(2) + 6 * x(1) - 9 * x(2) + 2, [-1, 0])
+\end{minted}
+
+And the function returns $\mathbf{x} = [0.0000, 1.5000], f(\mathbf{x}) = -4.7500$ as a result which is the right answer.
+
+\subsubsection{DFP and BFGS Method}
+\begin{minted}[breaklines, breakanywhere]{matlab}
+function [xval, fval] = DFPMethod(funct, initial, [epsilon], [step], [initialMatrix])
+function [xval, fval] = BFGSMethod(funct, initial, [epsilon], [step], [initialMatrix])
+\end{minted}
+
+\paragraph{Introduction}
+Find the vector which reaches the minimum value in a function. The inputs and outputs are consistent with that in Fastest Descent, and there is another optional input variable named \textcolor{blue}{initialMatrix}. As the Hessian Matrix is very likely to be singular in Newton Method, DFP Method and BFGS Method is two simliar approximation of Hessian Matrix. By these methods, the functions are much more stable than Newton Method.
+
+\paragraph{Algorithm}
+The algorithm is implemented below, \textcolor{blue}{funct} is denoted as $f$, the gradient of $f$ is denoted as $\nabla f$, \textcolor{blue}{initial} is denoted as $\mathbf{x}$, \textcolor{blue}{step} is denoted as $l$, \textcolor{blue}{epsilon} is denoted as $\varepsilon$, \textcolor{blue}{initialMatrix} is denoted as $A$. First take a look at DFP method:
+
+\begin{enumerate}
+    \item If $||\nabla f(\mathbf{x})|| \geqslant \varepsilon$, go to Step 2, else go to Step 6.
+    \item Let direction $\mathbf{d} = -\nabla f(\mathbf{x}) A$. And search the point $\lambda$ which minimizes $f(\mathbf{x} + \lambda \mathbf{d})$. Set a counter $c$.
+    \item If $c$ is smaller than the dimension of the function, go to Step 4, else go to Step 5.
+    \item Let $\mathbf{x'} = \mathbf{x} + \lambda \mathbf{d}, \mathbf{p} = \mathbf{x'} - \mathbf{x}, \mathbf{q} = \nabla f(\mathbf{x'}) - \nabla f(\mathbf{x})$. 
+
+    For DFP Method, update $A$ using the following formula:
+    \begin{equation*}
+        A = A + \frac{p^T p}{p q^T} - \frac{A q^T q A}{q A q^T}
+    \end{equation*}
+
+    For BFGS Method, update $A$ using the following formula:
+    \begin{equation*}
+        A = A + \frac{1 + q A q^T}{p q^T} \frac{p^T p}{p q^T} - \frac{p^T q A + A q^T p}{p q^T}
+    \end{equation*}
+
+    And then, let $c = c + 1$, and go to Step 1.
+    \item Restore $A$ to its original value, and reset the counter $c = 0$, go to Step 1.
+    \item Return $\mathbf{x}, f(\mathbf{x})$ as outputs.
+\end{enumerate}
+
+\paragraph{\textcolor{red}{Warnings}}
+\begin{enumerate}
+    \item \textcolor{blue}{step} must be greater than $0$. Its default value is $10^{-3}$.
+    \item \textcolor{blue}{epsilon} must be greater than $0$. Its default value is $10^{-6}$.
+    \item \textcolor{blue}{initialMatrix} has a default value, $A = I$, and it must be \textbf{symmetric}.
+    \item Some functions are unable to be optimized. If you meet an error says 'Infinite boundary found'. It's likely that the function doesn't have a minimum (which means it minimum is $-\infty$).
+    \item Try to make $\varepsilon$ larger if it takes a long time to calculate (or run into a dead loop). If search step $\lambda$ reaches $0$, we will forcibly terminate the iteration.
+\end{enumerate}
+
+\paragraph{Example}
+Suppose we want to get the minimum of $f(x_1, x_2) = 2 x_1^2 + 3 x_2^2 - 4 x_1 x_2 + 6 x_1 - 9 x_2 + 2$ using default settings with an initial point $[-1, 0]$ and an initial matrix $A = diag(1, 2)$. We can use the function like this:
+\begin{minted}[breaklines, breakanywhere]{matlab}
+[xval, fval] = DFPMethod(@(x) 2 * x(1)^2 + 3 * x(2)^2 -4 * x(1) * x(2) + 6 * x(1) - 9 * x(2) + 2, [-1, 0], 1e-6, 1e-3, [1 0; 0 2])
+[xval, fval] = BFGSMethod(@(x) 2 * x(1)^2 + 3 * x(2)^2 -4 * x(1) * x(2) + 6 * x(1) - 9 * x(2) + 2, [-1, 0], 1e-6, 1e-3, [1 0; 0 2])
+\end{minted}
+
+And the function returns $\mathbf{x} = [-0.0000, 1.5000], f(\mathbf{x}) = -4.7500$ as a result which is the right answer.
+
+\subsubsection{Further Reading}
+\paragraph{Quadratic Terminability} 
+This means when an algorithm is applied on a \textbf{quadratic convex} function, a local optimal solution can be reached in limited iterations. Conjugate Gradient Method, Newton Method, DFP Method and BFGS Method has this property.
+
+\paragraph{Broyden Group}
+DFP Method and BFGS Method is very simliar, so there must be a way to combine them. We call this combination Broyden Group. Every function in Broyden Group has the following update method:
+\begin{equation*}
+    A = \varphi A_{BFGS} + (1 - \varphi) A_{DFP}
+\end{equation*}
+
+And every function in it has quadratic terminability. Our codes can be extended to use Broyden Group:
+\begin{enumerate}
+    \item Target these lines on DFP and BFGS method:
+    \begin{minted}[breaklines, breakanywhere]{matlab}
+% DFP Method
+Hval = Hval + pval' * pval / (pval * qval') - Hval * (qval') * qval * Hval / (qval * Hval * qval');
+% BFGS Method
+Hval = Hval + (1 + qval * Hval * qval' / (pval * qval')) * (pval' * pval) / (pval * qval') - (pval' * qval * Hval + Hval * qval' * pval) / (pval * qval');
+    \end{minted}
+    \item Use a unifrom random number in $[0, 1]$ to represent $\varphi$.
+    \item Combine the lines to one single line, together with $\varphi$.
+\end{enumerate}
+
+We are not going to implement this algorithm, so do it yourself if you want to have a try.
+
+\paragraph{Changing Search Method}
+These function are very limited in some conditions, and Golden Mean Method is forcibly applied to all of the functions in this section. If you really want to change the searching method, try to change some codes like this:
+\begin{enumerate}
+    \item Target at this line:
+    \begin{minted}[breaklines, breakanywhere]{matlab}
+lambda = UniversalSearch(dec_funct, 0, epsilon, step, 'goldenmean', 0, +inf);
+    \end{minted}
+    \item Change the line to:
+    \begin{minted}[breaklines, breakanywhere]{matlab}
+lambda = UniversalSearch(dec_funct, 0, epsilon, step, '...');
+    \end{minted}
+    \item Fill in the $\dots$ with the method you want. 
+\end{enumerate}
+
+Please note that these functions might misbehave after changes are made.
+
+\subsection{Not Based on Derivatives}
+\subsubsection{Hooke Jeeves Method}
+\begin{minted}[breaklines, breakanywhere]{matlab}
+function [xval, fval] = HookeJeeves(funct, initial, [epsilon], [dirMatrix], [delta], [alpha], [beta])
+\end{minted}
+
+\paragraph{Introduction}
+Find the vector which reaches the minimum value in a function. This function doesn't need derivative of \textcolor{blue}{funct}. And \textcolor{blue}{funct, initial, epsilon} is the same as what's mentioned before. \textcolor{blue}{dirMatrix} is the initial searching direction matrix. \textcolor{blue}{delta} is the initial move step. \textcolor{blue}{alpha} is a multiply factor. \textcolor{blue}{beta} is a shrinking factor. As this method doesn't depend on derivative of a function, it might be slower than some methods based on derivatives.
+
+\paragraph{Algorithm}
+The algorithm is implemented below, \textcolor{blue}{funct} is denoted as $f$, \textcolor{blue}{initial} is denoted as $\mathbf{x}$, \textcolor{blue}{epsilon} is denoted as $\varepsilon$, \textcolor{blue}{dirMatrix} is denoted as $A$, \textcolor{blue}{delta} is denoted as $\delta$, \textcolor{blue}{alpha} is denoted as $\alpha$, \textcolor{blue}{beta} is denoted as $\beta$:
+\begin{enumerate}
+    \item Let a temporary variable $\mathbf{y} = \mathbf{x}$. If $\delta \geqslant \varepsilon$, go to Step 2, else go to Step 6.
+    \item Check out the minimum in $f(\mathbf{y} + \delta A_i), f(\mathbf{y} - \delta A_i), \mathbf{y}$ in every direction ($A_i$ is the $i$th row of $A$), and moves $\mathbf{y}$ to the minimum one.
+    \item If $f(\mathbf{y}) < f(\mathbf{x})$, go to Step 4, else go to Step 5.
+    \item Let $\mathbf{x'} = \mathbf{y}, \mathbf{y} = \mathbf{x'} + \alpha(\mathbf{x'} - \mathbf{x}), \mathbf{x} = \mathbf{x'}$, and go to Step 1.
+    \item Let $\delta = \beta \delta, \mathbf{y} = \mathbf{x}$, and go to Step 1.
+    \item Return $\mathbf{x}, f(\mathbf{x})$ as outputs.
+\end{enumerate}
+
+\paragraph{\textcolor{red}{Warnings}}
+\begin{enumerate}
+    \item \textcolor{blue}{alpha} must be greater than $1$. Its default value is $2$.
+    \item \textcolor{blue}{beta} must be between $0$ and $1$, excluding $0$ and $1$. Its default value is $0.5$.
+    \item \textcolor{blue}{delta} must be greater than 0. Its default value is $1$.
+    \item \textcolor{blue}{epsilon} must be greater than $0$. Its default value is $10^{-6}$.
+    \item \textcolor{blue}{dirMatrix} must be a $n \times n$ matrix. Its default value is $A = I$.
+\end{enumerate}
+
+\paragraph{Example}
+Suppose we want to get the minimum of $f(x_1, x_2) = 2 x_1^2 + 3 x_2^2 - 4 x_1 x_2 + 6 x_1 - 9 x_2 + 2$ using default settings with an initial point $[-1, 0]$ and other default settings. We can use the function like this:
+\begin{minted}[breaklines, breakanywhere]{matlab}
+[xval, fval] = HookeJeeves(@(x) 2 * x(1)^2 + 3 * x(2)^2 -4 * x(1) * x(2) + 6 * x(1) - 9 * x(2) + 2, [-1, 0])
+\end{minted}
+
+And the function returns $\mathbf{x} = [-0.0000, 1.5000], f(\mathbf{x}) = -4.7500$ as a result which is the right answer.
+
+\subsubsection{Rosenbrock Method}
+\begin{minted}[breaklines, breakanywhere]{matlab}
+function [xval, fval] = Rosenbrock(funct, initial, [epsilon], [dirMatrix], [delta], [alpha], [beta])    
+\end{minted}
+
+\paragraph{Introduction}
+Find the vector which reaches the minimum value in a function. This function doesn't need derivative of \textcolor{blue}{funct}. And \textcolor{blue}{funct, initial, epsilon, dirMatrix, alpha, beta} is the same as what's mentioned in the Hooke Jeeves Method part. \textcolor{blue}{delta} is a vector which has the same size as \textcolor{blue}{initial}. An orthogonalization is conducted after a new direction is calculated. 
+
+\paragraph{Algorithm}
+The algorithm is implemented below, \textcolor{blue}{funct} is denoted as $f$, \textcolor{blue}{initial} is denoted as $\mathbf{x}$, \textcolor{blue}{epsilon} is denoted as $\varepsilon$, \textcolor{blue}{dirMatrix} is denoted as $A$, \textcolor{blue}{delta} is denoted as $\mathbf{\delta}$, \textcolor{blue}{alpha} is denoted as $\alpha$, \textcolor{blue}{beta} is denoted as $\beta$:
+\begin{enumerate}
+    \item Let a temporary variable $\mathbf{y} = \mathbf{x}$. If $||\mathbf{\delta}|| \geqslant \varepsilon$, go to Step 2, else go to Step 6.
+    \item Let $\mathbf{y'} = \mathbf{y}$, In every direction, if $f(\mathbf{y} + \mathbf{\delta}_i A_i) < f(\mathbf{y})$, let $\mathbf{\delta}_i = \alpha \mathbf{\delta}_i$ and $\mathbf{y} = \mathbf{y} + \mathbf{\delta}_i A_i$, else $\mathbf{\delta}_i = \beta \mathbf{\delta}_i$.
+    \item If $f(\mathbf{y}) = f(\mathbf{y'})$ and $f(\mathbf{y}) < f(\mathbf{x})$, go to Step 4, else go to Step 1.
+    \item Let $\mathbf{x'} = \mathbf{y}, \mathbf{d} = \mathbf{x'} - \mathbf{x}, \mathbf{\lambda}_i = \mathbf{d} \frac{A_i}{||A_i||}$. New direction $A^*$ is calculated using the following formula (nvars means 'number of variables'):
+    \begin{equation*}
+        \left\{
+        \begin{aligned}
+            & A^*_i = A_i, \quad \mathbf{\lambda}_i = 0 \\
+            & A^*_i = \sum_{j = i}^{\mbox{nvars of $x$}}{\mathbf{\lambda}_j A_j}, \quad \mbox{Otherwise}
+        \end{aligned}
+        \right.
+    \end{equation*}
+    \item Orthogonalize $A^*$ using Gram-Schmidt orthogonalization. Update $A$ with that result, and go to Step 1.
+    \item Return $\mathbf{x}, f(\mathbf{x})$ as outputs.
+\end{enumerate}
+
+\paragraph{\textcolor{red}{Warnings}}
+\begin{enumerate}
+    \item \textcolor{blue}{alpha} must be greater than $1$. Its default value is $2$.
+    \item \textcolor{blue}{beta} must be between $-1$ and $0$, excluding $-1$ and $0$. Its default value is $-0.5$.
+    \item \textcolor{blue}{delta} must be the same size as \textcolor{blue}{initial}. Its default value is $[1, 1, \cdots, 1]$.
+    \item \textcolor{blue}{epsilon} must be greater than $0$. Its default value is $10^{-6}$.
+    \item \textcolor{blue}{dirMatrix} must be a $n \times n$ matrix. Its default value is $A = I$.
+\end{enumerate}
+
+\paragraph{Example}
+Suppose we want to get the minimum of $f(x_1, x_2) = 2 x_1^2 + 3 x_2^2 - 4 x_1 x_2 + 6 x_1 - 9 x_2 + 2$ using default settings with an initial point $[-1, 0]$ and other default settings. We can use the function like this:
+\begin{minted}[breaklines, breakanywhere]{matlab}
+[xval, fval] = Rosenbrock(@(x) 2 * x(1)^2 + 3 * x(2)^2 -4 * x(1) * x(2) + 6 * x(1) - 9 * x(2) + 2, [-1, 0])
+\end{minted}
+
+And the function returns $\mathbf{x} = [0.0000, 1.5000], f(\mathbf{x}) = -4.7500$ as a result which is the right answer.
+
+\subsubsection{Powell and Powell-Sargent Method}
+\begin{minted}[breaklines, breakanywhere]{matlab}
+function [xval, fval] = PowellMethod(funct, initial, [epsilon], [step], [dirMatrix])
+function [xval, fval] = PowellSargentMethod(funct, initial, [epsilon], [step], [dirMatrix])
+\end{minted}
+
+\paragraph{Introduction}
+Find the vector which reaches the minimum value in a function. This function doesn't need derivative of \textcolor{blue}{funct}. However, it still needs to do a search to find an optimal step. \textcolor{blue}{initial} is the initial point, \textcolor{blue}{epsilon, step} is the same as what's mentioned in the Search part. \textcolor{blue}{dirMatrix} is the initial direction matrix.
+
+\paragraph{Algorithm}
+The algorithm is implemented below, \textcolor{blue}{funct} is denoted as $f$, \textcolor{blue}{initial} is denoted as $\mathbf{x}$, \textcolor{blue}{epsilon} is denoted as $\varepsilon$, \textcolor{blue}{dirMatrix} is denoted as $A$, \textcolor{blue}{step} is denoted as $l$:
+\begin{enumerate}
+    \item Let $\mathbf{x'} = +\inf$.
+    \item If $||\mathbf{x'} - \mathbf{x}|| \geqslant \varepsilon$, go to Step 3, else go to Step 6.
+    \item Let $\mathbf{x'} = \mathbf{x}$. Search for the minimum of $f$ in every direction $A_i$ using Golden Mean Method. Update $\mathbf{x}$ at the same time.
+    \item Update searching direction matrix: $A_{i + 1} = A_i, i = 1, 2, \cdots, n - 1$ ($A$ is a $n \times n$ matrix).
+    \item For the last row of $A$, $A_n = \mathbf{x'} - \mathbf{x}$. Search for the minimum of $f$ in every direction $A_i$ using Golden Mean Method. Update $\mathbf{x}$ at the same time. Go to Step 2.
+    \item Return $\mathbf{x}, f(\mathbf{x})$ as outputs.
+\end{enumerate}
+
+Powell-Sargent Method is a variation of the Powell Method. 
+\begin{enumerate}
+    \item In Step 3, find out the index which $f$ has the largest decrement, and store the largest decrement as $D$.
+    \item In Step 5, replace the index direction in Step 3 if the following criterion is satisfied:
+    \begin{equation*}
+        |\lambda| > \sqrt{\frac{f(\mathbf{x}) - f(\mathbf{x'})}{D}}
+    \end{equation*}
+\end{enumerate}
+
+\paragraph{\textcolor{red}{Warnings}}
+\begin{enumerate}
+    \item \textcolor{blue}{epsilon} must be greater than $0$. Its default value is $10^{-6}$.
+    \item \textcolor{blue}{step} must be greater than $0$. Its default value is $10^{-3}$.
+    \item \textcolor{blue}{dirMatrix} must be a $n \times n$ matrix. Its default value is $A = I$.
+    \item Some functions are unable to be optimized. If you meet an error says 'Infinite boundary found'. It's likely that the function doesn't have a minimum (which means it minimum is $-\infty$).
+    \item Try to make $\varepsilon$ larger if it takes a long time to calculate (or run into a dead loop). If search step $\lambda$ reaches $0$, we will forcibly terminate the iteration.
+    \item \textcolor{red}{[Bug Warning]} As we can't process unbounded functions well in this method now, a bound is set to let the program run.  
+\end{enumerate}
+
+\paragraph{Example}
+Suppose we want to get the minimum of $f(x_1, x_2) = 2 x_1^2 + 3 x_2^2 - 4 x_1 x_2 + 6 x_1 - 9 x_2 + 2$ using default settings with an initial point $[-1, 0]$ and other default settings. We can use the function like this:
+\begin{minted}[breaklines, breakanywhere]{matlab}
+[xval, fval] = PowellMethod(@(x) 2 * x(1)^2 + 3 * x(2)^2 -4 * x(1) * x(2) + 6 * x(1) - 9 * x(2) + 2, [-1, 0])
+[xval, fval] = PowellSargentMethod(@(x) 2 * x(1)^2 + 3 * x(2)^2 -4 * x(1) * x(2) + 6 * x(1) - 9 * x(2) + 2, [-1, 0])
+\end{minted}
+
+And the function returns $\mathbf{x} = [0.0000, 1.5000], f(\mathbf{x}) = -4.7500$ as a result which is the right answer.
+
+Powell-Sargent Method is more stable than the original Powell Method.
+
+\section{Constrained Optimization}
+\subsection{Barrier Methods}
+\textcolor{red}{Warning:} Barrier methods are very instable, it's not recommended to use all of the functions here.
+
+\subsubsection{Outer Barrier Method}
+\begin{minted}[breaklines, breakanywhere]{matlab}
+function [xval, fval] = OuterBarrier(funct, initial, constraint, equality, [sigma], [epsilon], [step])
+\end{minted}
+\paragraph{Introduction}
+Outer Barrier Method can solve the following problem:
+\begin{align*}
+    \mbox{minimize } & f(\mathbf{x}) \\
+    \mbox{s.t. } & g_i(\mathbf{x}) \geqslant 0, \quad i = 1, 2, \cdots, m \\
+                 & h_j(\mathbf{x}) = 0, \quad j = 1, 2, \cdots, l \\
+\end{align*}
+
+\textcolor{blue}{constraint} is a cell of inequality constraints, \textcolor{blue}{equality} is a cell of equality constraints, \textcolor{blue}{sigma} is the size to set up a barrier, \textcolor{blue}{funct, initialstep, epsilon} is the same as what's mentioned before. This function is based on Get Outer Barrier function.
+
+\paragraph{Algorithm}
+The algorithm is implemented below, \textcolor{blue}{funct} is denoted as $f$, \textcolor{blue}{initial} is denoted as $\mathbf{x}$, \textcolor{blue}{constraint} is denoted as $g_i$, \textcolor{blue}{equality} is denoted as $h_j$, \textcolor{blue}{sigma} is denoted as $\sigma$,  \textcolor{blue}{epsilon} is denoted as $\varepsilon$, \textcolor{blue}{step} is denoted as $l$:
+\begin{enumerate}
+    \item Constrant barrier function $P(\mathbf{x})$ by $g, h$:
+    \begin{align*}
+        & P(\mathbf{x}) = \sum_{i = 1}^{m}{\varphi(g_i(\mathbf{x}))} + \sum_{j = 1}^{l}{\psi(h_j(\mathbf{x}))} \\
+        & \varphi = (\max\{0, -g_i(\mathbf{x})\})^2 \\
+        & \psi = h_j^2(\mathbf{x})
+    \end{align*}
+    \item If $\sigma P(\mathbf{x}) \geqslant \varepsilon$, go to Step 3, else go to Step 7.
+    \item Convert the constrained problem to unconstrained problem:
+    \begin{equation*}
+        \mbox{minimize } F(\mathbf{x}, \sigma) = f(\mathbf{x}) + \sigma P(\mathbf{x})
+    \end{equation*}
+    \item Solve the following unconstrained problem using Conjugate Gradient Method, update $\mathbf{x'} = \mathbf{x}$.
+    \item Using an adaptive method to update $\sigma, l$. Set a factor $q = 5 + [(\log_{10}{(f(\mathbf{x'}) - f(\mathbf{x}))}) / {3}]$. If $q < 1$, let $q = 1, l = 0.1l$. ($[a]$ means floor function of $a$)
+    \item Update $\sigma = q\sigma$, $\mathbf{x} = \mathbf{x'}$, and go to Step 2.
+    \item Return $\mathbf{x}, f(\mathbf{x})$ as outputs.
+\end{enumerate}
+
+\paragraph{\textcolor{red}{Warnings}}
+\begin{enumerate}
+    \item \textcolor{blue}{sigma} must be greater than $0$. Its default value is $1000$.
+    \item \textcolor{blue}{epsilon} must be greater than $0$. Its default value is $10^{-6}$.
+    \item \textcolor{blue}{step} must be greater than $0$. Its default value is $10^{-3}$.
+    \item Conjugate Gradient in the unconstrained problem part can be changed with other methods by changing the code:
+    \begin{minted}[breaklines, breakanywhere]{matlab}
+[xval, ~] = ConjugateGradient(opt_funct, xval, epsilon, step);   
+    \end{minted}
+\end{enumerate}
+
+\subsubsection{Inner Barrier Method}
+\begin{minted}[breaklines, breakanywhere]{matlab}
+function [xval, fval] = InnerBarrier(funct, initial, constraint, [type], [beta], [epsilon], [step])
+\end{minted}
+\paragraph{Introduction}
+Inner Barrier Method can solve the following problem:
+\begin{align*}
+    \mbox{minimize } & f(\mathbf{x}) \\
+    \mbox{s.t. } & g_i(\mathbf{x}) \geqslant 0, \quad i = 1, 2, \cdots, m
+\end{align*}
+
+\textcolor{blue}{constraint} is a cell of inequality constraints, \textcolor{blue}{beta} is the size to set up a barrier, \textcolor{blue}{funct, initialstep, epsilon} is the same as what's mentioned before. This function is based on Get Inner Barrier function.
+
+\paragraph{Algorithm}
+The algorithm is implemented below, \textcolor{blue}{funct} is denoted as $f$, \textcolor{blue}{initial} is denoted as $\mathbf{x}$, \textcolor{blue}{constraint} is denoted as $g_i$, \textcolor{blue}{beta} is denoted as $\beta$,  \textcolor{blue}{epsilon} is denoted as $\varepsilon$, \textcolor{blue}{step} is denoted as $l$:
+\begin{enumerate}
+    \item Constrant barrier function $B(\mathbf{x})$ by $g$. If type is set to $1$:
+    \begin{equation*}
+        B(\mathbf{x}) = \sum_{i = 1}^{m}{\frac{1}{g_i(\mathbf{x})}}
+    \end{equation*}
+    If type is set to $2$:
+    \begin{equation*}
+        B(\mathbf{x}) = \sum_{i = 1}^{m}{\ln{(g_i(\mathbf{x}))}}
+    \end{equation*}
+    \item If $\beta B(\mathbf{x}) \geqslant \varepsilon$, go to Step 3, else go to Step 7.
+    \item Convert the constrained problem to unconstrained problem:
+    \begin{equation*}
+        \mbox{minimize } G(\mathbf{x}, \beta) = f(\mathbf{x}) + \beta B(\mathbf{x})
+    \end{equation*}
+    \item Solve the following unconstrained problem using Conjugate Gradient Method, update $\mathbf{x'} = \mathbf{x}$.
+    \item Using an adaptive method to update $\beta, l$. Set a factor $q = 1 / (5 + [(\log_{10}{(f(\mathbf{x'}) - f(\mathbf{x}))}) / {3}])$. If $q > 1$, let $q = 1, l = 0.1l$. ($[a]$ means floor function of $a$)
+    \item Update $\beta = q\beta$, $\mathbf{x} = \mathbf{x'}$, and go to Step 2.
+    \item Return $\mathbf{x}, f(\mathbf{x})$ as outputs.
+\end{enumerate}
+
+\paragraph{\textcolor{red}{Warnings}}
+\begin{enumerate}
+    \item \textcolor{blue}{beta} must be between $0$ and $1$, excluding $0$. Its default value is $0.5$.
+    \item \textcolor{blue}{epsilon} must be greater than $0$. Its default value is $10^{-6}$.
+    \item \textcolor{blue}{step} must be greater than $0$. Its default value is $10^{-3}$.
+    \item Conjugate Gradient in the unconstrained problem part can be changed with other methods by changing the code:
+    \begin{minted}[breaklines, breakanywhere]{matlab}
+[xval, ~] = ConjugateGradient(opt_funct, xval, epsilon, step);   
+    \end{minted}
+\end{enumerate}
+
+\subsection{Problems With Linear Constrants}
+\subsubsection{Zoutendijk Method}
+\begin{minted}[breaklines, breakanywhere]{matlab}
+function [xval, fval] = ZoutendijkMethod(funct, initial, A, b, [Aeq], [beq], [epsilon], [step])
+\end{minted}
+
+\paragraph{Introduction}
+Zoutendijk Method can solve the following problem:
+\begin{align*}
+    \mbox{minimize } & f(\mathbf{x}) \\
+    \mbox{s.t. } & A\mathbf{x} \geqslant \mathbf{b} \\
+                 & A_{\mbox{eq}} \mathbf{x} = \mathbf{b}_{\mbox{eq}}
+\end{align*}
+
+In the program, \textcolor{blue}{A, b, Aeq, beq} is the same as what's mentioned in the Linear Programming section, Simplex Solver part, \textcolor{blue}{funct, initial, epsilon, step} is the same as what's mentioned in the Search Functions part.
+
+\paragraph{Algorithm}
+The algorithm is implemented below. \textcolor{blue}{A} is denoted as $A$, \textcolor{blue}{b} is denoted as $\mathbf{b}$, \textcolor{blue}{Aeq} is denoted as $E$, \textcolor{blue}{beq} is denoted as $\mathbf{e}$. \textcolor{blue}{funct} is denoted as $f$, and the derivative of $f$ is denoted as $\nabla f$, \textcolor{blue}{initial} is denoted as $\mathbf{x}$, \textcolor{blue}{epsilon} is denoted as $\varepsilon$, \textcolor{blue}{step} is denoted as $l$:
+\begin{enumerate}
+    \item Seperate $A$. If $A \mathbf{x} = \mathbf{b}$, put it to $A_1, \mathbf{b}_1$, else put it to $A_2, \mathbf{b}_2$.
+    \item Solving the following LP using Simplex Solver:
+    \begin{align*}
+        \mbox{minimize } & \nabla f(\mathbf{x}) \mathbf{d} \\
+        \mbox{s.t. } & A_1 \mathbf{d} \geqslant 0 \\
+                     & E \mathbf{d} = 0 \\
+                     & -1 \leqslant d_j \leqslant 1, \quad j = 1, 2, \cdots, n.
+    \end{align*}
+    $\mathbf{d}$ is the solution.
+    \item If $\nabla f(\mathbf{x}) \mathbf{d} \neq 0$, go to Step 4, else go to Step 7.
+    \item Solving the upperbound of $\lambda$ by $A_2 \mathbf{x} + \lambda A_2 \mathbf{d} \geqslant \mathbf{b}_2$. Let it be $\lambda_{\max}$. ($\lambda_{\max}$ can be $+\infty$)
+    \item Solving the problem by using the Golden Mean Method:
+    \begin{align*}
+        \mbox{minimize } & f(\mathbf{x} + \lambda \mathbf{d}) \\
+        \mbox{s.t.} & 0 \leqslant \lambda \leqslant \lambda_{\max} 
+    \end{align*}
+    \item Update $\mathbf{x} = \mathbf{x} + \lambda \mathbf{d}$, and update $A_1, A_2, \mathbf{b}_1, \mathbf{b}_2$ by the new $\mathbf{x}$. Go to Step 3.
+    \item Return $\mathbf{x}, f(\mathbf{x})$ as outputs.
+\end{enumerate}
+
+\paragraph{\textcolor{red}{Warnings}}
+\begin{enumerate}
+    \item \textcolor{blue}{epsilon} must be greater than $0$. Its default value is $10^{-6}$.
+    \item \textcolor{blue}{step} must be greater than $0$. Its default value is $10^{-3}$.
+    \item Please note that you don't need to transpose \textcolor{blue}{initial}. But you still need to make the sizes match.
+    \item \textcolor{red}{[Bug Warning]} This program can't cover all of the problems, as the algorithm might not be a closed map.
+\end{enumerate}
+
+\paragraph{Example}
+Suppose we are goint to solve the following problem:
+\begin{align*}
+    \mbox{minimize } &  x_1^2 + x_2^2 - 2x_1 - 4x_2 + 6 \\
+    \mbox{s.t. } & -2x_1 + x_2 + 1 \geqslant 0 \\
+                 & -x_1 - x_2 + 2 \geqslant 0 \\
+                 x_1, x_2 \geqslant 0.
+\end{align*}
+
+We can use the function like this (with an initial point of $[0, 0]$ and all the default settings):
+\begin{minted}[breaklines, breakanywhere]{matlab}
+[xval, fval] = ZoutendijkMethod(@(x) x(1)^2 + x(2)^2 - 2 * x(1) - 4 * x(2) + 6, [0, 0], [-2 1; -1 -1; 1 0; 0 1], [-1 -2 0 0]')
+\end{minted}
+
+And the function returns xval $=[0.5000, 1.5000]$ and fval $= 1.5000$ as a result, which is the right answer.
+
+\section{Licenses}
+\subsection{Project License}
+\begin{center}
+    The GNU Public License, Version 2
+\end{center}
+
+\subsubsection{Preamble}
+
+The licenses for most software are designed to take away your freedom to
+share and change it.  By contrast, the \textsc{gnu} General Public License is
+intended to guarantee your freedom to share and change free software---to
+make sure the software is free for all its users.  This General Public
+License applies to most of the Free Software Foundation's software and to
+any other program whose authors commit to using it.  (Some other Free
+Software Foundation software is covered by the \textsc{gnu} Library
+General Public License instead.)  You can apply it to your programs, too.
+
+When we speak of free software, we are referring to freedom, not price.
+Our General Public Licenses are designed to make sure that you have the
+freedom to distribute copies of free software (and charge for this service
+if you wish), that you receive source code or can get it if you want it,
+that you can change the software or use pieces of it in new free programs;
+and that you know you can do these things.
+
+To protect your rights, we need to make restrictions that forbid anyone to
+deny you these rights or to ask you to surrender the rights.  These
+restrictions translate to certain responsibilities for you if you
+distribute copies of the software, or if you modify it.
+
+For example, if you distribute copies of such a program, whether gratis or
+for a fee, you must give the recipients all the rights that you have.  You
+must make sure that they, too, receive or can get the source code.  And
+you must show them these terms so they know their rights.
+
+We protect your rights with two steps: (1) copyright the software, and (2)
+offer you this license which gives you legal permission to copy,
+distribute and/or modify the software.
+
+Also, for each author's protection and ours, we want to make certain that
+everyone understands that there is no warranty for this free software.  If
+the software is modified by someone else and passed on, we want its
+recipients to know that what they have is not the original, so that any
+problems introduced by others will not reflect on the original authors'
+reputations.
+
+Finally, any free program is threatened constantly by software patents.
+We wish to avoid the danger that redistributors of a free program will
+individually obtain patent licenses, in effect making the program
+proprietary.  To prevent this, we have made it clear that any patent must
+be licensed for everyone's free use or not licensed at all.
+
+The precise terms and conditions for copying, distribution and
+modification follow.
+
+\subsubsection{Terms and Conditions For Copying, Distribution and
+  Modification}
+
+\begin{enumerate}
+
+\addtocounter{enumi}{-1}
+
+\item
+This License applies to any program or other work which contains a notice
+placed by the copyright holder saying it may be distributed under the
+terms of this General Public License.  The ``Program'', below, refers to
+any such program or work, and a ``work based on the Program'' means either
+the Program or any derivative work under copyright law: that is to say, a
+work containing the Program or a portion of it, either verbatim or with
+modifications and/or translated into another language.  (Hereinafter,
+translation is included without limitation in the term ``modification''.)
+Each licensee is addressed as ``you''.
+
+Activities other than copying, distribution and modification are not
+covered by this License; they are outside its scope.  The act of
+running the Program is not restricted, and the output from the Program
+is covered only if its contents constitute a work based on the
+Program (independent of having been made by running the Program).
+Whether that is true depends on what the Program does.
+
+\item You may copy and distribute verbatim copies of the Program's source
+  code as you receive it, in any medium, provided that you conspicuously
+  and appropriately publish on each copy an appropriate copyright notice
+  and disclaimer of warranty; keep intact all the notices that refer to
+  this License and to the absence of any warranty; and give any other
+  recipients of the Program a copy of this License along with the Program.
+
+You may charge a fee for the physical act of transferring a copy, and you
+may at your option offer warranty protection in exchange for a fee.
+
+\item
+You may modify your copy or copies of the Program or any portion
+of it, thus forming a work based on the Program, and copy and
+distribute such modifications or work under the terms of Section 1
+above, provided that you also meet all of these conditions:
+
+\begin{enumerate}
+
+\item
+You must cause the modified files to carry prominent notices stating that
+you changed the files and the date of any change.
+
+\item
+You must cause any work that you distribute or publish, that in
+whole or in part contains or is derived from the Program or any
+part thereof, to be licensed as a whole at no charge to all third
+parties under the terms of this License.
+
+\item
+If the modified program normally reads commands interactively
+when run, you must cause it, when started running for such
+interactive use in the most ordinary way, to print or display an
+announcement including an appropriate copyright notice and a
+notice that there is no warranty (or else, saying that you provide
+a warranty) and that users may redistribute the program under
+these conditions, and telling the user how to view a copy of this
+License.  (Exception: if the Program itself is interactive but
+does not normally print such an announcement, your work based on
+the Program is not required to print an announcement.)
+
+\end{enumerate}
+
+
+These requirements apply to the modified work as a whole.  If
+identifiable sections of that work are not derived from the Program,
+and can be reasonably considered independent and separate works in
+themselves, then this License, and its terms, do not apply to those
+sections when you distribute them as separate works.  But when you
+distribute the same sections as part of a whole which is a work based
+on the Program, the distribution of the whole must be on the terms of
+this License, whose permissions for other licensees extend to the
+entire whole, and thus to each and every part regardless of who wrote it.
+
+Thus, it is not the intent of this section to claim rights or contest
+your rights to work written entirely by you; rather, the intent is to
+exercise the right to control the distribution of derivative or
+collective works based on the Program.
+
+In addition, mere aggregation of another work not based on the Program
+with the Program (or with a work based on the Program) on a volume of
+a storage or distribution medium does not bring the other work under
+the scope of this License.
+
+\item
+You may copy and distribute the Program (or a work based on it,
+under Section 2) in object code or executable form under the terms of
+Sections 1 and 2 above provided that you also do one of the following:
+
+\begin{enumerate}
+
+\item
+Accompany it with the complete corresponding machine-readable
+source code, which must be distributed under the terms of Sections
+1 and 2 above on a medium customarily used for software interchange; or,
+
+\item
+Accompany it with a written offer, valid for at least three
+years, to give any third party, for a charge no more than your
+cost of physically performing source distribution, a complete
+machine-readable copy of the corresponding source code, to be
+distributed under the terms of Sections 1 and 2 above on a medium
+customarily used for software interchange; or,
+
+\item
+Accompany it with the information you received as to the offer
+to distribute corresponding source code.  (This alternative is
+allowed only for noncommercial distribution and only if you
+received the program in object code or executable form with such
+an offer, in accord with Subsubsection b above.)
+
+\end{enumerate}
+
+
+The source code for a work means the preferred form of the work for
+making modifications to it.  For an executable work, complete source
+code means all the source code for all modules it contains, plus any
+associated interface definition files, plus the scripts used to
+control compilation and installation of the executable.  However, as a
+special exception, the source code distributed need not include
+anything that is normally distributed (in either source or binary
+form) with the major components (compiler, kernel, and so on) of the
+operating system on which the executable runs, unless that component
+itself accompanies the executable.
+
+If distribution of executable or object code is made by offering
+access to copy from a designated place, then offering equivalent
+access to copy the source code from the same place counts as
+distribution of the source code, even though third parties are not
+compelled to copy the source along with the object code.
+
+\item
+You may not copy, modify, sublicense, or distribute the Program
+except as expressly provided under this License.  Any attempt
+otherwise to copy, modify, sublicense or distribute the Program is
+void, and will automatically terminate your rights under this License.
+However, parties who have received copies, or rights, from you under
+this License will not have their licenses terminated so long as such
+parties remain in full compliance.
+
+\item
+You are not required to accept this License, since you have not
+signed it.  However, nothing else grants you permission to modify or
+distribute the Program or its derivative works.  These actions are
+prohibited by law if you do not accept this License.  Therefore, by
+modifying or distributing the Program (or any work based on the
+Program), you indicate your acceptance of this License to do so, and
+all its terms and conditions for copying, distributing or modifying
+the Program or works based on it.
+
+\item
+Each time you redistribute the Program (or any work based on the
+Program), the recipient automatically receives a license from the
+original licensor to copy, distribute or modify the Program subject to
+these terms and conditions.  You may not impose any further
+restrictions on the recipients' exercise of the rights granted herein.
+You are not responsible for enforcing compliance by third parties to
+this License.
+
+\item
+If, as a consequence of a court judgment or allegation of patent
+infringement or for any other reason (not limited to patent issues),
+conditions are imposed on you (whether by court order, agreement or
+otherwise) that contradict the conditions of this License, they do not
+excuse you from the conditions of this License.  If you cannot
+distribute so as to satisfy simultaneously your obligations under this
+License and any other pertinent obligations, then as a consequence you
+may not distribute the Program at all.  For example, if a patent
+license would not permit royalty-free redistribution of the Program by
+all those who receive copies directly or indirectly through you, then
+the only way you could satisfy both it and this License would be to
+refrain entirely from distribution of the Program.
+
+If any portion of this section is held invalid or unenforceable under
+any particular circumstance, the balance of the section is intended to
+apply and the section as a whole is intended to apply in other
+circumstances.
+
+It is not the purpose of this section to induce you to infringe any
+patents or other property right claims or to contest validity of any
+such claims; this section has the sole purpose of protecting the
+integrity of the free software distribution system, which is
+implemented by public license practices.  Many people have made
+generous contributions to the wide range of software distributed
+through that system in reliance on consistent application of that
+system; it is up to the author/donor to decide if he or she is willing
+to distribute software through any other system and a licensee cannot
+impose that choice.
+
+This section is intended to make thoroughly clear what is believed to
+be a consequence of the rest of this License.
+
+\item
+If the distribution and/or use of the Program is restricted in
+certain countries either by patents or by copyrighted interfaces, the
+original copyright holder who places the Program under this License
+may add an explicit geographical distribution limitation excluding
+those countries, so that distribution is permitted only in or among
+countries not thus excluded.  In such case, this License incorporates
+the limitation as if written in the body of this License.
+
+\item
+The Free Software Foundation may publish revised and/or new versions
+of the General Public License from time to time.  Such new versions will
+be similar in spirit to the present version, but may differ in detail to
+address new problems or concerns.
+
+Each version is given a distinguishing version number.  If the Program
+specifies a version number of this License which applies to it and ``any
+later version'', you have the option of following the terms and conditions
+either of that version or of any later version published by the Free
+Software Foundation.  If the Program does not specify a version number of
+this License, you may choose any version ever published by the Free Software
+Foundation.
+
+\item
+If you wish to incorporate parts of the Program into other free
+programs whose distribution conditions are different, write to the author
+to ask for permission.  For software which is copyrighted by the Free
+Software Foundation, write to the Free Software Foundation; we sometimes
+make exceptions for this.  Our decision will be guided by the two goals
+of preserving the free status of all derivatives of our free software and
+of promoting the sharing and reuse of software generally.
+
+\end{enumerate}
+
+\subsubsection{No Warranty}
+
+\begin{enumerate}
+\item
+Because the program is licensed free of charge, there is no warranty
+for the program, to the extent permitted by applicable law.  Except when
+otherwise stated in writing the copyright holders and/or other parties
+provide the program ``as is'' without warranty of any kind, either expressed
+or implied, including, but not limited to, the implied warranties of
+merchantability and fitness for a particular purpose.  The entire risk as
+to the quality and performance of the program is with you.  Should the
+program prove defective, you assume the cost of all necessary servicing,
+repair or correction.
+
+\item
+In no event unless required by applicable law or agreed to in writing
+will any copyright holder, or any other party who may modify and/or
+redistribute the program as permitted above, be liable to you for damages,
+including any general, special, incidental or consequential damages arising
+out of the use or inability to use the program (including but not limited
+to loss of data or data being rendered inaccurate or losses sustained by
+you or third parties or a failure of the program to operate with any other
+programs), even if such holder or other party has been advised of the
+possibility of such damages.
+\end{enumerate}
+
+\subsection{Document License}
+\begin{center}
+    GNU Free Documentation License, Version 1.2, November 2002
+\end{center}
+\subsubsection{Preamble}
+
+The purpose of this License is to make a manual, textbook, or other
+functional and useful document ``free'' in the sense of freedom: to
+assure everyone the effective freedom to copy and redistribute it,
+with or without modifying it, either commercially or noncommercially.
+Secondarily, this License preserves for the author and publisher a way
+to get credit for their work, while not being considered responsible
+for modifications made by others.
+
+This License is a kind of ``copyleft'', which means that derivative
+works of the document must themselves be free in the same sense.  It
+complements the GNU General Public License, which is a copyleft
+license designed for free software.
+
+We have designed this License in order to use it for manuals for free
+software, because free software needs free documentation: a free
+program should come with manuals providing the same freedoms that the
+software does.  But this License is not limited to software manuals;
+it can be used for any textual work, regardless of subject matter or
+whether it is published as a printed book.  We recommend this License
+principally for works whose purpose is instruction or reference.
+
+\subsubsection{Applicability and definitions}
+
+This License applies to any manual or other work, in any medium, that
+contains a notice placed by the copyright holder saying it can be
+distributed under the terms of this License.  Such a notice grants a
+world-wide, royalty-free license, unlimited in duration, to use that
+work under the conditions stated herein.  The \textbf{``Document''}, below,
+refers to any such manual or work.  Any member of the public is a
+licensee, and is addressed as \textbf{``you''}.  You accept the license if you
+copy, modify or distribute the work in a way requiring permission
+under copyright law.
+
+A \textbf{``Modified Version''} of the Document means any work containing the
+Document or a portion of it, either copied verbatim, or with
+modifications and/or translated into another language.
+
+A \textbf{``Secondary Section''} is a named appendix or a front-matter section of
+the Document that deals exclusively with the relationship of the
+publishers or authors of the Document to the Document's overall subject
+(or to related matters) and contains nothing that could fall directly
+within that overall subject.  (Thus, if the Document is in part a
+textbook of mathematics, a Secondary Section may not explain any
+mathematics.)  The relationship could be a matter of historical
+connection with the subject or with related matters, or of legal,
+commercial, philosophical, ethical or political position regarding
+them.
+
+The \textbf{``Invariant Sections''} are certain Secondary Sections whose titles
+are designated, as being those of Invariant Sections, in the notice
+that says that the Document is released under this License.  If a
+section does not fit the above definition of Secondary then it is not
+allowed to be designated as Invariant.  The Document may contain zero
+Invariant Sections.  If the Document does not identify any Invariant
+Sections then there are none.
+
+The \textbf{``Cover Texts''} are certain short passages of text that are listed,
+as Front-Cover Texts or Back-Cover Texts, in the notice that says that
+the Document is released under this License.  A Front-Cover Text may
+be at most 5 words, and a Back-Cover Text may be at most 25 words.
+
+A \textbf{``Transparent''} copy of the Document means a machine-readable copy,
+represented in a format whose specification is available to the
+general public, that is suitable for revising the document
+straightforwardly with generic text editors or (for images composed of
+pixels) generic paint programs or (for drawings) some widely available
+drawing editor, and that is suitable for input to text formatters or
+for automatic translation to a variety of formats suitable for input
+to text formatters.  A copy made in an otherwise Transparent file
+format whose markup, or absence of markup, has been arranged to thwart
+or discourage subsequent modification by readers is not Transparent.
+An image format is not Transparent if used for any substantial amount
+of text.  A copy that is not ``Transparent'' is called \textbf{``Opaque''}.
+
+Examples of suitable formats for Transparent copies include plain
+ASCII without markup, Texinfo input format, LaTeX input format, SGML        
+or XML using a publicly available DTD, and standard-conforming simple
+HTML, PostScript or PDF designed for human modification.  Examples of
+transparent image formats include PNG, XCF and JPG.  Opaque formats
+include proprietary formats that can be read and edited only by
+proprietary word processors, SGML or XML for which the DTD and/or
+processing tools are not generally available, and the
+machine-generated HTML, PostScript or PDF produced by some word
+processors for output purposes only.
+
+The \textbf{``Title Page''} means, for a printed book, the title page itself,
+plus such following pages as are needed to hold, legibly, the material
+this License requires to appear in the title page.  For works in
+formats which do not have any title page as such, ``Title Page'' means
+the text near the most prominent appearance of the work's title,
+preceding the beginning of the body of the text.
+
+A section \textbf{``Entitled XYZ''} means a named subunit of the Document whose
+title either is precisely XYZ or contains XYZ in parentheses following
+text that translates XYZ in another language.  (Here XYZ stands for a
+specific section name mentioned below, such as \textbf{``Acknowledgements''},
+\textbf{``Dedications''}, \textbf{``Endorsements''}, or \textbf{``History''}.)
+To \textbf{``Preserve the Title''}
+of such a section when you modify the Document means that it remains a
+section ``Entitled XYZ'' according to this definition.
+
+The Document may include Warranty Disclaimers next to the notice which
+states that this License applies to the Document.  These Warranty
+Disclaimers are considered to be included by reference in this
+License, but only as regards disclaiming warranties: any other
+implication that these Warranty Disclaimers may have is void and has
+no effect on the meaning of this License.
+
+\subsubsection{Verbatim Copying}
+
+You may copy and distribute the Document in any medium, either
+commercially or noncommercially, provided that this License, the
+copyright notices, and the license notice saying this License applies
+to the Document are reproduced in all copies, and that you add no other
+conditions whatsoever to those of this License.  You may not use
+technical measures to obstruct or control the reading or further
+copying of the copies you make or distribute.  However, you may accept
+compensation in exchange for copies.  If you distribute a large enough
+number of copies you must also follow the conditions in section 3.
+
+You may also lend copies, under the same conditions stated above, and
+you may publicly display copies.
+
+\subsubsection{Copying in Quantity}
+
+If you publish printed copies (or copies in media that commonly have
+printed covers) of the Document, numbering more than 100, and the
+Document's license notice requires Cover Texts, you must enclose the
+copies in covers that carry, clearly and legibly, all these Cover
+Texts: Front-Cover Texts on the front cover, and Back-Cover Texts on
+the back cover.  Both covers must also clearly and legibly identify
+you as the publisher of these copies.  The front cover must present
+the full title with all words of the title equally prominent and
+visible.  You may add other material on the covers in addition.
+Copying with changes limited to the covers, as long as they preserve
+the title of the Document and satisfy these conditions, can be treated
+as verbatim copying in other respects.
+
+If the required texts for either cover are too voluminous to fit
+legibly, you should put the first ones listed (as many as fit
+reasonably) on the actual cover, and continue the rest onto adjacent
+pages.
+
+If you publish or distribute Opaque copies of the Document numbering
+more than 100, you must either include a machine-readable Transparent
+copy along with each Opaque copy, or state in or with each Opaque copy
+a computer-network location from which the general network-using
+public has access to download using public-standard network protocols
+a complete Transparent copy of the Document, free of added material.
+If you use the latter option, you must take reasonably prudent steps,
+when you begin distribution of Opaque copies in quantity, to ensure
+that this Transparent copy will remain thus accessible at the stated
+location until at least one year after the last time you distribute an
+Opaque copy (directly or through your agents or retailers) of that
+edition to the public.
+
+It is requested, but not required, that you contact the authors of the
+Document well before redistributing any large number of copies, to give
+them a chance to provide you with an updated version of the Document.
+
+\subsubsection{Modifications}
+
+You may copy and distribute a Modified Version of the Document under
+the conditions of sections 2 and 3 above, provided that you release
+the Modified Version under precisely this License, with the Modified
+Version filling the role of the Document, thus licensing distribution
+and modification of the Modified Version to whoever possesses a copy
+of it.  In addition, you must do these things in the Modified Version:
+
+\begin{itemize}
+\item[A.]
+   Use in the Title Page (and on the covers, if any) a title distinct
+   from that of the Document, and from those of previous versions
+   (which should, if there were any, be listed in the History section
+   of the Document).  You may use the same title as a previous version
+   if the original publisher of that version gives permission.
+
+\item[B.]
+   List on the Title Page, as authors, one or more persons or entities
+   responsible for authorship of the modifications in the Modified
+   Version, together with at least five of the principal authors of the
+   Document (all of its principal authors, if it has fewer than five),
+   unless they release you from this requirement.
+
+\item[C.]
+   State on the Title page the name of the publisher of the
+   Modified Version, as the publisher.
+
+\item[D.]
+   Preserve all the copyright notices of the Document.
+
+\item[E.]
+   Add an appropriate copyright notice for your modifications
+   adjacent to the other copyright notices.
+
+\item[F.]
+   Include, immediately after the copyright notices, a license notice
+   giving the public permission to use the Modified Version under the
+   terms of this License, in the form shown in the Addendum below.
+
+\item[G.]
+   Preserve in that license notice the full lists of Invariant Sections
+   and required Cover Texts given in the Document's license notice.
+
+\item[H.]
+   Include an unaltered copy of this License.
+
+\item[I.]
+   Preserve the section Entitled ``History'', Preserve its Title, and add
+   to it an item stating at least the title, year, new authors, and
+   publisher of the Modified Version as given on the Title Page.  If
+   there is no section Entitled ``History'' in the Document, create one
+   stating the title, year, authors, and publisher of the Document as
+   given on its Title Page, then add an item describing the Modified
+   Version as stated in the previous sentence.
+
+\item[J.]
+   Preserve the network location, if any, given in the Document for
+   public access to a Transparent copy of the Document, and likewise
+   the network locations given in the Document for previous versions
+   it was based on.  These may be placed in the ``History'' section.
+   You may omit a network location for a work that was published at
+   least four years before the Document itself, or if the original
+   publisher of the version it refers to gives permission.
+
+\item[K.]
+   For any section Entitled ``Acknowledgements'' or ``Dedications'',
+   Preserve the Title of the section, and preserve in the section all
+   the substance and tone of each of the contributor acknowledgements
+   and/or dedications given therein.
+
+\item[L.]
+   Preserve all the Invariant Sections of the Document,
+   unaltered in their text and in their titles.  Section numbers
+   or the equivalent are not considered part of the section titles.
+
+\item[M.]
+   Delete any section Entitled ``Endorsements''.  Such a section
+   may not be included in the Modified Version.
+
+\item[N.]
+   Do not retitle any existing section to be Entitled ``Endorsements''
+   or to conflict in title with any Invariant Section.
+
+\item[O.]
+   Preserve any Warranty Disclaimers.
+\end{itemize}
+
+If the Modified Version includes new front-matter sections or
+appendices that qualify as Secondary Sections and contain no material
+copied from the Document, you may at your option designate some or all
+of these sections as invariant.  To do this, add their titles to the
+list of Invariant Sections in the Modified Version's license notice.
+These titles must be distinct from any other section titles.
+
+You may add a section Entitled ``Endorsements'', provided it contains
+nothing but endorsements of your Modified Version by various
+parties--for example, statements of peer review or that the text has
+been approved by an organization as the authoritative definition of a
+standard.
+
+You may add a passage of up to five words as a Front-Cover Text, and a
+passage of up to 25 words as a Back-Cover Text, to the end of the list
+of Cover Texts in the Modified Version.  Only one passage of
+Front-Cover Text and one of Back-Cover Text may be added by (or
+through arrangements made by) any one entity.  If the Document already
+includes a cover text for the same cover, previously added by you or
+by arrangement made by the same entity you are acting on behalf of,
+you may not add another; but you may replace the old one, on explicit
+permission from the previous publisher that added the old one.
+
+The author(s) and publisher(s) of the Document do not by this License
+give permission to use their names for publicity for or to assert or
+imply endorsement of any Modified Version.
+
+\subsubsection{Combining Documents}
+
+You may combine the Document with other documents released under this
+License, under the terms defined in section 4 above for modified
+versions, provided that you include in the combination all of the
+Invariant Sections of all of the original documents, unmodified, and
+list them all as Invariant Sections of your combined work in its
+license notice, and that you preserve all their Warranty Disclaimers.
+
+The combined work need only contain one copy of this License, and
+multiple identical Invariant Sections may be replaced with a single
+copy.  If there are multiple Invariant Sections with the same name but
+different contents, make the title of each such section unique by
+adding at the end of it, in parentheses, the name of the original
+author or publisher of that section if known, or else a unique number.
+Make the same adjustment to the section titles in the list of
+Invariant Sections in the license notice of the combined work.
+
+In the combination, you must combine any sections Entitled ``History''
+in the various original documents, forming one section Entitled
+``History''; likewise combine any sections Entitled ``Acknowledgements'',
+and any sections Entitled ``Dedications''.  You must delete all sections
+Entitled ``Endorsements''.
+
+
+\subsubsection{Collection of Documents}
+
+You may make a collection consisting of the Document and other documents
+released under this License, and replace the individual copies of this
+License in the various documents with a single copy that is included in
+the collection, provided that you follow the rules of this License for
+verbatim copying of each of the documents in all other respects.
+
+You may extract a single document from such a collection, and distribute
+it individually under this License, provided you insert a copy of this
+License into the extracted document, and follow this License in all
+other respects regarding verbatim copying of that document.
+
+
+\subsubsection{Aggregating with independent Works}
+
+A compilation of the Document or its derivatives with other separate
+and independent documents or works, in or on a volume of a storage or
+distribution medium, is called an ``aggregate'' if the copyright
+resulting from the compilation is not used to limit the legal rights
+of the compilation's users beyond what the individual works permit.
+When the Document is included in an aggregate, this License does not
+apply to the other works in the aggregate which are not themselves
+derivative works of the Document.
+
+If the Cover Text requirement of section 3 is applicable to these
+copies of the Document, then if the Document is less than one half of
+the entire aggregate, the Document's Cover Texts may be placed on
+covers that bracket the Document within the aggregate, or the
+electronic equivalent of covers if the Document is in electronic form.
+Otherwise they must appear on printed covers that bracket the whole
+aggregate.
+
+
+
+\subsubsection{Translation}
+
+Translation is considered a kind of modification, so you may
+distribute translations of the Document under the terms of section 4.
+Replacing Invariant Sections with translations requires special
+permission from their copyright holders, but you may include
+translations of some or all Invariant Sections in addition to the
+original versions of these Invariant Sections.  You may include a
+translation of this License, and all the license notices in the
+Document, and any Warranty Disclaimers, provided that you also include
+the original English version of this License and the original versions
+of those notices and disclaimers.  In case of a disagreement between
+the translation and the original version of this License or a notice
+or disclaimer, the original version will prevail.
+
+If a section in the Document is Entitled ``Acknowledgements'',
+``Dedications'', or ``History'', the requirement (section 4) to Preserve
+its Title (section 1) will typically require changing the actual
+title.
+
+
+\subsubsection{Termination}
+
+You may not copy, modify, sublicense, or distribute the Document except
+as expressly provided for under this License.  Any other attempt to
+copy, modify, sublicense or distribute the Document is void, and will
+automatically terminate your rights under this License.  However,
+parties who have received copies, or rights, from you under this
+License will not have their licenses terminated so long as such
+parties remain in full compliance.
+
+
+\subsubsection{Future Revisions of this License}
+
+The Free Software Foundation may publish new, revised versions
+of the GNU Free Documentation License from time to time.  Such new
+versions will be similar in spirit to the present version, but may
+differ in detail to address new problems or concerns.  See
+http://www.gnu.org/copyleft/.
+
+Each version of the License is given a distinguishing version number.
+If the Document specifies that a particular numbered version of this
+License ``or any later version'' applies to it, you have the option of
+following the terms and conditions either of that specified version or
+of any later version that has been published (not as a draft) by the
+Free Software Foundation.  If the Document does not specify a version
+number of this License, you may choose any version ever published (not
+as a draft) by the Free Software Foundation.
+
+
+\subsubsection{Addendum: How to use this License for your documents}
+
+To use this License in a document you have written, include a copy of
+the License in the document and put the following copyright and
+license notices just after the title page:
+
+\bigskip
+\begin{quote}
+    Copyright \copyright \textsc{year your name}.
+    Permission is granted to copy, distribute and/or modify this document
+    under the terms of the GNU Free Documentation License, Version 1.2
+    or any later version published by the Free Software Foundation;
+    with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+    A copy of the license is included in the section entitled ``GNU
+    Free Documentation License''.
+\end{quote}
+\bigskip
+
+If you have Invariant Sections, Front-Cover Texts and Back-Cover Texts,
+replace the ``with \dots\ Texts.'' line with this:
+
+\bigskip
+\begin{quote}
+    with the Invariant Sections being \textsc{list their titles}, with the
+    Front-Cover Texts being \textsc{list}, and with the Back-Cover
+    Texts being \textsc{list}.
+\end{quote}
+\bigskip
+
+If you have Invariant Sections without Cover Texts, or some other
+combination of the three, merge those two alternatives to suit the
+situation.
+
+If your document contains nontrivial examples of program code, we
+recommend releasing these examples in parallel under your choice of
+free software license, such as the GNU General Public License,
+to permit their use in free software.
+
+\end{document}
