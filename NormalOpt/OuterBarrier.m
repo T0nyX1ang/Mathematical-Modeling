@@ -17,7 +17,7 @@ function [xval, fval] = OuterBarrier(funct, initial, constraint, equality, sigma
     if (step <= 0)
         error("step must be greater than 0");
     end
-    if (epsilon < 0)
+    if (epsilon <= 0)
         error("epsilon must be greater than 0");
     elseif (sigma <= 0)
         error("sigma must be greater than 0");
