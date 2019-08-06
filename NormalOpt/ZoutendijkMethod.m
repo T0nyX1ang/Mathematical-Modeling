@@ -60,16 +60,7 @@ function [xval, fval] = ZoutendijkMethod(funct, initial, A, b, Aeq, beq, epsilon
         end
         % minimize function value
         dec_funct = @(lambda) funct(t_xval' + lambda * d');
-        [start, stop] = searchValidInterval(dec_funct, 0, step);
-        if (start < lambda_max) % naturally find one interval
-            start = start * (start > 0);
-            if (stop > lambda_max)
-                stop = lambda_max;
-            end
-        else % use a fixed interval
-            start = 0; stop = 1;
-        end
-        lambda = searchGoldenMean(dec_funct, start, stop, epsilon);
+        lambda = UniversalSearch(dec_funct, 0, epsilon, step, 'goldenmean', 0, lambda_max);
         t_xval = t_xval + lambda * d;
         tval = getTangentValue(tangent, t_xval');
         % decomposition
