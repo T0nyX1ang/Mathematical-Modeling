@@ -24,10 +24,10 @@ function [xval, fval] = InnerBarrier(funct, initial, constraint, type, beta, eps
         error("step must be greater than 0");
     elseif (type ~= 1 && type ~= 2)
         error("type must be 1 or 2");
-    elseif (epsilon < 0)
+    elseif (epsilon <= 0)
         error("epsilon must be greater than 0");
     elseif (beta <= 0 || beta > 1)
-        error("sigma must be greater than 0");
+        error("sigma must be between 0 and 1");
     end
     
     dimension = size(initial, 2);
